@@ -1,0 +1,23 @@
+{
+  "name": "image-microservice",
+  "version": "1.0.0",
+  "description": "image processing api",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgoralcz/image-microservice.git"
+  },
+  "author": "Joshua Goralczyk <joshgor01@gmail.com> (https://github.com/jgoralcz/aki-api)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jgoralcz/image-microservice/issues"
+  },
+  "homepage": "https://github.com/jgoralcz/image-microservice#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "jimp": "^0.6.1"
+  }
+}
