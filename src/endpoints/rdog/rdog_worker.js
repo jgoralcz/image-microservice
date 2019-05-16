@@ -18,10 +18,10 @@ if (!isMainThread) {
         let buffer;
         try {
             // const {text} = workerData;
+            const template = await image.clone();
 
-            buffer = await image.print(font, 350, 25, message, 280);
+            buffer = await template.print(font, 350, 25, message.text, 280);
             buffer = await buffer.getBufferAsync(Jimp.MIME_JPEG);
-            console.log('done');
         }
         catch (error) {
             console.error(error);

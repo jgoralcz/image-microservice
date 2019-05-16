@@ -17,6 +17,4 @@ app.use(express.json()); // we need to get the body in json format
 app.listen(9002);
 
 // start the factory with our app
-new startFactory();
-startFactory.setExpressApp(app);
-startFactory.loopServices().catch(console.error);
+new startFactory(app);
