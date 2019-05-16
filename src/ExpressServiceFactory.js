@@ -1,4 +1,4 @@
-const rdog = require('./endpoints/Rdog.js');
+const rdog = require('./endpoints/rdog/Rdog.js');
 
 module.exports = class ExpressServiceFactory {
 
