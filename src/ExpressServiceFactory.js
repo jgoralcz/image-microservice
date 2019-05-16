@@ -1,5 +1,5 @@
-const rdog = require('./endpoints/rdog/Rdog.js');
-const {Worker, isMainThread} = require('worker_threads');
+const rdog = require('./endpoints/Rdog.js');
+const { Worker} = require('worker_threads');
 
 module.exports = class ExpressServiceFactory {
 
@@ -22,71 +22,89 @@ module.exports = class ExpressServiceFactory {
      * @param module the module to initialize
      */
     initService(module) {
+        // create new worker threads based off their specification
+        let workerArray = new Array(module.maxThreads);
 
-        if (isMainThread) {
-            // create new worker threads based off their specification
-            let workerArray = new Array(module.maxThreads);
+        // persist the workers into its own array
+        for(let i = 0; i < module.maxThreads; i++) {
+            workerArray[i] = createWorker(module.workerScript);
+        }
 
-            // persist the workers into an array
-            for(let i = 0; i < module.maxThreads; i++) {
-                const worker = new Worker(module.workerScript);
-                workerArray[i] = worker;
+        // get the counter and max threads to loop through to "load balance" it out (kind of lazy way)
+        let counter = module.counter;
+        const maxThreads = module.maxThreads;
 
-                worker.on('exit', (code) => console.error('thread exited', code));
-                worker.on('error', (error) => console.error(error));
+        // add the module nap to the express app
+        this.expressApp.use(`/api/${module.name}`, function (req, res, next) {
+
+            // json body needed
+            const body = req.body;
+
+            // check the body to make sure we have the right args
+            for(let i = 0; i < module.args.length; i++) {
+                let arg = module.args[i];
+
+                // no body with this argument, bad input
+                if(!body[arg]) {
+                    res.status(400);
+                    res.contentType('application/json');
+                    res.send(`{"error": "Incorrect Parameters met. Needs: ${module.args}"}`);
+                    return;
+                }
             }
 
-            let counter = module.counter;
-            const maxThreads = module.maxThreads;
+            // simple way of queueing the threads
+            counter++;
+            if(counter >= maxThreads) counter = 0;
+            const worker = workerArray[counter];
 
-            // const worker2 = new Worker(workerScript, {workerData: {text: 'text'}});
-            this.expressApp.use(`/api/${module.name}`, function (req, res, next) {
 
-                const body = req.body;
+            // recovery method, create a new worker
+            if(worker == null) {
+                // create a new worker.
+                workerArray[counter] = createWorker(module.workerScript);
 
-                // check the body to make sure we have the right args
-                for(let i = 0; i < module.args.length; i++) {
-                    let arg = module.args[i];
-
-                    // no body
-                    if(!body[arg]) {
-                        res.status(400);
-                        res.contentType('application/json');
-                        res.send(`{"error": "Incorrect Parameters met. Needs: ${module.args}"}`);
-                        return;
-                    }
-                }
-
-                // simple way of queueing the threads
-                counter++;
-                if(counter >= maxThreads) counter = 0;
-                const worker = workerArray[counter];
-
+                // check if it's still null
                 if(worker == null) {
-                    console.error('worker dead.');
                     res.status(500);
                     res.contentType('application/json');
                     res.send('{"error": "image has errors."}');
                     return;
                 }
+            }
 
-                worker.once('message', (buffer) => {
+            // listen for message back, which is hopefully a buffer image.
+            worker.once('message', (buffer) => {
 
-                    // make sure we have an uint8array
-                    if (buffer instanceof Uint8Array) {
-                        res.contentType('image/jpg');
-                        res.send(Buffer.from(buffer));
-                    }
-                    else {
-                        res.status(500);
-                        res.contentType('application/json');
-                        res.send('{"error": "server error, image has errors."}');
-                    }
-                });
-
-                worker.postMessage(body);
-
+                // make sure we have an uint8array
+                if (buffer instanceof Uint8Array) {
+                    res.status(200);
+                    res.contentType('image/jpg');
+                    res.send(Buffer.from(buffer));
+                }
+                else {
+                    res.status(500);
+                    res.contentType('application/json');
+                    res.send('{"error": "server error, image has errors."}');
+                }
             });
-        }
+
+            // send the message
+            worker.postMessage(body);
+
+        });
     }
+};
+
+/**
+ * create a new worker based off the script
+ * @param script the script to create a worker thread off of.
+ * @returns {Promise<void>}
+ */
+const createWorker = (script) => {
+    const worker = new Worker(script);
+    worker.on('exit', (code) => console.error('thread exited', code));
+    worker.on('error', (error) => console.error(error));
+
+    return worker;
 };
