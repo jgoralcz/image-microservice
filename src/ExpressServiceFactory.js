@@ -1,20 +1,23 @@
-const rdog = require('./endpoints/Rdog.js');
+const fs = require('fs');
 const { Worker} = require('worker_threads');
 
 module.exports = class ExpressServiceFactory {
 
     constructor(app) {
+        this.endpoints = '/endpoints/';
+        this.dir = './src' + this.endpoints;
         this.expressApp = app;
         this.loopServices().catch(console.error);
     }
 
     async loopServices() {
-        // loop through files
 
-        // take their variables and use them to build our stuff
-
-        this.initService(rdog);
-        // run all other files in this directory
+        // loop through files, sync so we can get it over with
+        fs.readdirSync(this.dir).forEach( file =>  {
+            // require the file then initialize the service.
+            const endpoint = require('.' + this.endpoints + file);
+            this.initService(endpoint);
+        });
     }
 
     /**
@@ -35,7 +38,7 @@ module.exports = class ExpressServiceFactory {
         const maxThreads = module.maxThreads;
 
         // add the module nap to the express app
-        this.expressApp.use(`/api/${module.name}`, function (req, res, next) {
+        this.expressApp.use(`/api/${module.name}`, (req, res, next) => {
 
             // json body needed
             const body = req.body;
