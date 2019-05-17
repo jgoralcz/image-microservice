@@ -13,9 +13,10 @@ module.exports = {
      * deepfries an image
      * @param imageURL the image url
      * @param opacity the opacity to fry
+     * @param saturation the saturation to apply
      * @returns {Promise<*>}
      */
-    overfriedProcess: async (imageURL, opacity) => {
+    overfriedProcess: async (imageURL, opacity, saturation=150) => {
 
         try {
             const image = await Jimp.read(imageURL);
@@ -30,9 +31,11 @@ module.exports = {
             img.opacity(opacity);
             image.composite(img, 0, 0);
 
-            image.color([
-                {apply: 'saturate', params: [150]}
-            ]);
+            if(saturation) {
+                image.color([
+                    {apply: 'saturate', params: [150]}
+                ]);
+            }
             image.scale(1.25);
             image.contrast(0.40);
             image.brightness(0.32);

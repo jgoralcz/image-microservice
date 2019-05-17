@@ -3,8 +3,8 @@ const deepfry = require('./Deepfry.js');
 module.exports =  {
     counter: 0,
     maxThreads: 3,
-    name: 'overfry',
-    workerScript:'./src/workers/Overfry_worker.js',
+    name: 'fry',
+    workerScript:'./src/workers/Fry_worker.js',
     args: ['image_url'],
 
     /**
