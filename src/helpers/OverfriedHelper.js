@@ -23,16 +23,17 @@ module.exports = {
             while (image.bitmap.width > 800 || image.bitmap.height > 800) {
                 image.scale(0.5);
             }
-            image.quality(30);
+            image.scale(0.80);
 
-            // const img = await new Jimp(image.bitmap.width, image.bitmap.height, '#ff7f00');
+            const img = await new Jimp(image.bitmap.width, image.bitmap.height, '#ff7f00');
 
-            // img.opacity(opacity);
-            // image.composite(img, 0, 0);
+            img.opacity(opacity);
+            image.composite(img, 0, 0);
 
             image.color([
                 {apply: 'saturate', params: [150]}
             ]);
+            image.scale(1.25);
             image.contrast(0.40);
             image.brightness(0.32);
             //255, 127, 0
@@ -40,6 +41,7 @@ module.exports = {
             image.scan(0, 0, image.bitmap.width, image.bitmap.height, noiseDark);
             image.scan(0, 0, image.bitmap.width, image.bitmap.height, noiseColor);
             image.normalize();
+            image.quality(40);
             return image;
 
         } catch (error) {
