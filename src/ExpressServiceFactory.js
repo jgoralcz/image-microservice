@@ -7,16 +7,24 @@ module.exports = class ExpressServiceFactory {
         this.endpoints = '/endpoints/';
         this.dir = './src' + this.endpoints;
         this.expressApp = app;
-        this.loopServices().catch(console.error);
+        this.loopServices();
     }
 
-    async loopServices() {
+    loopServices() {
 
         // loop through files, sync so we can get it over with
         fs.readdirSync(this.dir).forEach( file =>  {
             // require the file then initialize the service.
             const endpoint = require('.' + this.endpoints + file);
-            this.initService(endpoint);
+
+            // if we don't have an overriding initService, then let's use ours
+            if(!endpoint.initService) {
+                this.initService(endpoint);
+            }
+            else {
+                // use our own initService
+                endpoint.initService(endpoint, this.expressApp);
+            }
         });
     }
 
