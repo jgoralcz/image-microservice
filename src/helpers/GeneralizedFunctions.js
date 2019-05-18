@@ -5,7 +5,7 @@ module.exports = {
     /**
      *
      * @param image the user's image
-     * @param title the title to find the image in my folder
+     * @param template my preloaded image
      * @param resizeX resize the user's image x direction
      * @param resizeY resize the user's image y direction
      * @param rotate
@@ -17,10 +17,9 @@ module.exports = {
      * @param doNotCompositeTwice whether or not to composite twice, true means do not do it
      * @returns {Promise<void>}
      */
-    modifyImageOverImage: async (image, title, resizeX, resizeY, rotate, compositeX1, compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) => {
+    modifyImageOverImage: async (image, template, resizeX, resizeY, rotate, compositeX1, compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) => {
         try {
-            // get our image template
-            const underImage = await Jimp.read(`./assets/images/${title}`);
+            const underImage = await template.clone();
 
             // read in our new image
             let newImage = await Jimp.read(image);
