@@ -10,7 +10,7 @@ if (!isMainThread) {
         let buffer;
         try {
             //get image then get buffer after contrast
-            let image = await ofp.overfriedProcess(message.image_url, 0.43);
+            let image = await ofp.friedProcess(message.image_url, 0.43);
             if(image) {
                 buffer = await image.getBufferAsync(Jimp.MIME_JPEG);
             }

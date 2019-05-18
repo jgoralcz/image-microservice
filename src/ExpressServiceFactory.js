@@ -13,7 +13,7 @@ module.exports = class ExpressServiceFactory {
     loopServices() {
 
         // loop through files, sync so we can get it over with
-        fs.readdirSync(this.dir).forEach( file =>  {
+        fs.readdirSync(this.dir).forEach( async file =>  {
             // require the file then initialize the service.
             const endpoint = require('.' + this.endpoints + file);
 
@@ -23,7 +23,7 @@ module.exports = class ExpressServiceFactory {
             }
             else {
                 // use our own initService
-                endpoint.initService(endpoint, this.expressApp);
+                await endpoint.initService(endpoint, this.expressApp);
             }
         });
     }

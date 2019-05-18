@@ -16,7 +16,7 @@ module.exports = {
      * @param saturation the saturation to apply
      * @returns {Promise<*>}
      */
-    overfriedProcess: async (imageURL, opacity, saturation=150) => {
+    friedProcess: async (imageURL, opacity, saturation=150) => {
 
         try {
             const image = await Jimp.read(imageURL);
