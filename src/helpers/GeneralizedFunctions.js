@@ -6,6 +6,8 @@ module.exports = {
      *
      * @param image the user's image
      * @param template my preloaded image
+     * @param templateX the template's X size
+     * @param templateY the template's Y size
      * @param resizeX resize the user's image x direction
      * @param resizeY resize the user's image y direction
      * @param rotate
@@ -17,9 +19,11 @@ module.exports = {
      * @param doNotCompositeTwice whether or not to composite twice, true means do not do it
      * @returns {Promise<void>}
      */
-    modifyImageOverImage: async (image, template, resizeX, resizeY, rotate, compositeX1, compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) => {
+    modifyImageOverImage: async (image, template, templateX, templateY, resizeX, resizeY, rotate, compositeX1, compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) => {
         try {
-            const underImage = await template.clone();
+
+            const now = Date.now();
+            const underImage = await new Jimp(templateX, templateY, 0);
 
             // read in our new image
             let newImage = await Jimp.read(image);
@@ -46,14 +50,16 @@ module.exports = {
 
             let overlay;
             if(!doNotCompositeTwice) {
-                overlay = underImage.clone();
+                overlay = template.clone();
             }
+            console.log(Date.now() - now);
 
             //modify the image and then the buffer
-            let content = await underImage.composite(newImage, compositeX1, compositeY1);
+            // let content = await underImage.composite(newImage, compositeX1, compositeY1);
 
+            let content;
             if(!doNotCompositeTwice) {
-                content = await content.composite(overlay, compositeX2, compositeY2);
+                content = await underImage.composite(overlay, compositeX2, compositeY2);
             }
 
             return content.getBufferAsync(Jimp.MIME_JPEG);
