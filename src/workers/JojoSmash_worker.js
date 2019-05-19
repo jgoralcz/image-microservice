@@ -4,8 +4,8 @@ const gf = require('../helpers/GeneralizedFunctions.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
-    const x = 540;
-    const y = 909;
+    const x = 400;
+    const y = 673;
 
     let image;
     (async () => {
@@ -16,7 +16,7 @@ if (!isMainThread) {
 
         let buffer;
         try {
-            buffer = await gf.modifyImageOverImage(message.image_url, image, x, y, 480, 300, 0, 0, 310, 0, 0);
+            buffer = await gf.modifyImageOverImage(message.image_url, image, x, y, 355, 225, 0, 0, 230, 0, 0);
         } catch(error) {
             console.error(error);
         }

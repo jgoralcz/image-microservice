@@ -22,8 +22,7 @@ module.exports = {
     modifyImageOverImage: async (image, template, templateX, templateY, resizeX, resizeY, rotate, compositeX1, compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) => {
         try {
 
-            const now = Date.now();
-            const underImage = await new Jimp(templateX, templateY, 0);
+            const underImage = await new Jimp(templateX, templateY, 0x0);
 
             // read in our new image
             let newImage = await Jimp.read(image);
@@ -52,14 +51,12 @@ module.exports = {
             if(!doNotCompositeTwice) {
                 overlay = template.clone();
             }
-            console.log(Date.now() - now);
 
             //modify the image and then the buffer
-            // let content = await underImage.composite(newImage, compositeX1, compositeY1);
+            let content = await underImage.composite(newImage, compositeX1, compositeY1);
 
-            let content;
             if(!doNotCompositeTwice) {
-                content = await underImage.composite(overlay, compositeX2, compositeY2);
+                content = await content.composite(overlay, compositeX2, compositeY2);
             }
 
             return content.getBufferAsync(Jimp.MIME_JPEG);
