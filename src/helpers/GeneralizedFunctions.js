@@ -1,6 +1,8 @@
 const Jimp = require('jimp');
 
 module.exports = {
+    scale: 2.25,
+    unscale: 1/2.25,
 
     /**
      *
@@ -19,7 +21,8 @@ module.exports = {
      * @param doNotCompositeTwice whether or not to composite twice, true means do not do it
      * @returns {Promise<void>}
      */
-    modifyImageOverImage: async (image, template, templateX, templateY, resizeX, resizeY, rotate, compositeX1, compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) => {
+    modifyImageOverImage: async function (image, template, templateX, templateY, resizeX, resizeY, rotate, compositeX1,
+                                          compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) {
         try {
 
             const underImage = await new Jimp(templateX, templateY, 0x0);
@@ -29,22 +32,20 @@ module.exports = {
 
 
             // jimp has weird things when rotating
-            if(rotateFirst) {
-                if(rotate) {
-                    newImage.scale(3);
-                    newImage.rotate(rotate);
-                    newImage.scale(.333);
-                }
+            if(rotateFirst && rotate) {
+                newImage.scale(this.scale);
+                newImage.rotate(rotate);
+                newImage.scale(this.unscale);
             }
+
             if(resizeX && resizeY) {
                 newImage = newImage.resize(resizeX, resizeY);
             }
-            if(!rotateFirst) {
-                if(rotate) {
-                    newImage.scale(3);
-                    newImage.rotate(rotate);
-                    newImage.scale(.333);
-                }
+
+            if(!rotateFirst && rotate) {
+                newImage.scale(this.scale);
+                newImage.rotate(rotate);
+                newImage.scale(this.unscale);
             }
 
             let overlay;
@@ -59,9 +60,12 @@ module.exports = {
                 content = await content.composite(overlay, compositeX2, compositeY2);
             }
 
+            // don't have to send over so much data
+            content.quality(75);
+
             return content.getBufferAsync(Jimp.MIME_JPEG);
 
-        }catch(error) {
+        } catch(error) {
             console.error(error);
         }
         return undefined;
