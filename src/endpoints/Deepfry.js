@@ -2,7 +2,6 @@ const sharp = require('sharp');
 const { Worker } = require('worker_threads');
 
 module.exports =  {
-    counter: 0,
     maxThreads: 3,
     name: 'deepfry',
     workerScript:'./src/workers/Deepfry_worker.js',
@@ -23,7 +22,7 @@ module.exports =  {
         }
 
         // get the counter and max threads to loop through to "load balance" it out (kind of lazy way)
-        let counter = module.counter;
+        let counter = 0;
         const maxThreads = module.maxThreads;
 
         // add the module nap to the express app

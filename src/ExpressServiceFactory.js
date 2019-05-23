@@ -42,7 +42,7 @@ module.exports = class ExpressServiceFactory {
         }
 
         // get the counter and max threads to loop through to "load balance" it out (kind of lazy way)
-        let counter = module.counter;
+        let counter = 0;
         const maxThreads = module.maxThreads;
 
         // add the module nap to the express app
