@@ -1,18 +1,17 @@
 const deepfry = require('./Deepfry.js');
 
 module.exports =  {
-    counter: 0,
-    maxThreads: 2,
     name: 'fry',
-    workerScript:'./src/workers/Fry_worker.js',
     args: ['image_url'],
 
     /**
-     * the module to add
-     * @param module the module (this)
-     * @param expressApp the express app
+     * the worker message listener for this endpoint.
+     * @param req the request object.
+     * @param res the response object.
+     * @param worker the worker thread.
+     * @returns {*}
      */
-    initService(module, expressApp) {
-        deepfry.initService(module, expressApp);
+    workerMessageListener: function(req, res, worker) {
+        deepfry.workerMessageListener(req, res, worker);
     }
 };

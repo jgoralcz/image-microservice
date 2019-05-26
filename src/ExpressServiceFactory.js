@@ -5,6 +5,8 @@ module.exports = {
     endpoints: '/endpoints/',
     expressApp: undefined,
     jimpScript: './src/workers/Jimp_worker.js',
+    workerArray: undefined,
+    counter: 0,
 
     /**
      * inits the service.
@@ -14,7 +16,7 @@ module.exports = {
     init: function (app, numThreads) {
         this.dir = './src' + this.endpoints;
         this.expressApp = app;
-        this.maxThreads = numThreads || 5;
+        this.maxThreads = numThreads;
         this.createServicesAndWorkers();
     },
 
@@ -25,6 +27,17 @@ module.exports = {
      * Additionally, it's up to the user if they want to add their own.
      */
     createServicesAndWorkers: function () {
+
+        // create new worker threads based off their specification for the main script
+        // this script does not use node-canvas or sharp because they use their own threading.
+        this.workerArray = new Array(this.maxThreads);
+
+        // persist the workers into its own array
+        for(let i = 0; i < this.maxThreads; i++) {
+            this.workerArray[i] = createWorker(this.jimpScript);
+        }
+
+        const serviceObj = {counter: this.counter, workerScript: this.jimpScript, maxThreads: this.maxThreads};
 
         // loop through files, sync so we can get it over with
         fs.readdirSync(this.dir).forEach( async file =>  {
@@ -42,71 +55,69 @@ module.exports = {
                 }
             }
             else {
-                await endpoint.initService(endpoint, this.expressApp);
+                await endpoint.initService(endpoint, this.expressApp, serviceObj);
             }
         });
-
-        // create new worker threads based off their specification for the main script
-        // this script does not use node-canvas or sharp because they use their own threading.
-        let workerArray = new Array(this.maxThreads);
-
-        // persist the workers into its own array
-        for(let i = 0; i < this.maxThreads; i++) {
-            workerArray[i] = createWorker(this.jimpScript);
-            console.log('worker', workerArray[i]);
-        }
     },
 
     /**
      * init service and use the requested process function
      * @param module the module to initialize
+     * @param workerMessageListener worker message listener
      */
-    initService(module) {
-
-        // get the counter and max threads to loop through to "load balance" it out (kind of lazy way)
-        let counter = 0;
-        const maxThreads = this.maxThreads;
+    initService(module, workerMessageListener) {
 
         // add the module nap to the express app
         this.expressApp.use(`/api/${module.name}`, (req, res) => {
+            this.expressLogic(req, res, module, workerMessageListener);
+        });
+    },
 
-            // json body needed
-            const body = req.body;
+    /**
+     * logic for the endpoint.
+     * @param req the request.
+     * @param res the response.
+     * @param module the module
+     * @param workerMessageListener the worker listener to override if one is provided.
+     */
+    expressLogic(req, res, module, workerMessageListener) {
+        // json body needed
+        const body = req.body;
 
-            // check the body to make sure we have the right args
-            for(let i = 0; i < module.args.length; i++) {
-                let arg = module.args[i];
+        // check the body to make sure we have the right args
+        for(let i = 0; i < module.args.length; i++) {
+            let arg = module.args[i];
 
-                // no body with this argument, bad input
-                if(!body[arg]) {
-                    res.status(400);
-                    res.contentType('application/json');
-                    res.send(`{"error": "Incorrect Parameters met. Needs: ${module.args}"}`);
-                    return;
-                }
+            // no body with this argument, bad input
+            if(!body[arg]) {
+                res.status(400);
+                res.contentType('application/json');
+                res.send(`{"error": "Incorrect Parameters met. Needs: ${module.args}"}`);
+                return;
             }
+        }
 
-            // simple way of queueing the threads
-            counter++;
-            if(counter >= maxThreads) counter = 0;
-            const worker = workerArray[counter];
+        // simple way of queueing the threads
+        this.counter++;
+        if(this.counter >= this.maxThreads) this.counter = 0;
+        const worker = this.workerArray[this.counter];
 
-            console.log(worker);
+        // recovery method, create a new worker
+        if(worker == null) {
+            // create a new worker.
+            this.workerArray[this.counter] = createWorker(this.jimpScript);
 
-            // recovery method, create a new worker
+            // check if it's still null
             if(worker == null) {
-                // create a new worker.
-                workerArray[counter] = createWorker(this.jimpScript);
-
-                // check if it's still null
-                if(worker == null) {
-                    res.status(500);
-                    res.contentType('application/json');
-                    res.send('{"error": "image has errors."}');
-                    return;
-                }
+                res.status(500);
+                res.contentType('application/json');
+                res.send('{"error": "image has errors."}');
+                return;
             }
+        }
 
+        // no listener, add our own
+        if(workerMessageListener) {
             // listen for message back, which is hopefully a buffer image.
             worker.once('message', (buffer) => {
 
@@ -122,11 +133,14 @@ module.exports = {
                     res.send('{"error": "server error, image has errors."}');
                 }
             });
+        }
+        else {
+            module.workerMessageListener(req, res, worker);
+        }
 
-            // send the message
-            worker.postMessage({endpoint: module.name, body: body, buffer: module.buffer});
 
-        });
+        // send the message
+        worker.postMessage({endpoint: module.name, body: body, buffer: module.buffer});
     }
 };
 

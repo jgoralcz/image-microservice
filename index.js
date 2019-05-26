@@ -18,12 +18,12 @@ app.listen(9002);
 
 // parse args
 const args = process.argv.slice(2);
-let threads;
+let threads = 50;
 if(!isNaN(args[0])) {
     threads = parseInt(args[0]);
 }
 else {
-    console.error('No threads detected or not a number. Defaulting to 10.');
+    console.error(`No threads detected or not a number. Defaulting to ${threads}.`);
 }
 
 // start the factory with our app

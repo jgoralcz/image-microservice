@@ -2,7 +2,7 @@
 // canvas and sharp use their own threads which cause conflicts with worker threads.
 const { parentPort, isMainThread } = require('worker_threads');
 const bodypillow = require('./Bodypillow_worker.js');
-const bodypillowMale = require('./BodyPillowMale_worker.js');
+const bodypillowMale = require('./BodypillowMale_worker.js');
 const deepfry = require('./Deepfry_worker.js');
 const fry = require('./Fry_worker.js');
 const overfry = require('./Overfry_worker.js');
