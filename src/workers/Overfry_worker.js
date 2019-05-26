@@ -1,23 +1,22 @@
-const { parentPort, isMainThread } = require('worker_threads');
 const Jimp = require('jimp');
 const ofp = require('../helpers/OverfriedHelper');
 
-// check that the sorter was called as a worker thread
-if (!isMainThread) {
+module.exports = {
 
-    parentPort.on('message', async (message) => {
-
-        let buffer;
+    /**
+     * generates the image.
+     * @param image_url the user's image
+     * @returns {Promise<void>}
+     */
+    execute: async function(image_url) {
         try {
             //get image then get buffer after contrast
-            let image = await ofp.friedProcess(message.image_url, 0.48);
+            const image = await ofp.friedProcess(image_url, 0.48, 150);
             if(image) {
-                image = image.contrast(0.87);
-                buffer = await image.getBufferAsync(Jimp.MIME_JPEG);
+                return await image.getBufferAsync(Jimp.MIME_JPEG);
             }
         } catch(error) {
             console.error(error);
         }
-        parentPort.postMessage(buffer);
-    });
-}
+    }
+};

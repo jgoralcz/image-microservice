@@ -1,6 +1,5 @@
 module.exports =  {
-    maxThreads: 2,
     name: 'jojosmash',
-    workerScript:'./src/workers/JojoSmash_worker.js',
-    args: ['image_url']
+    args: ['image_url'],
+    filepath: './assets/images/jojo_smash.png'
 };

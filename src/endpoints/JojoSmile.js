@@ -1,6 +1,5 @@
 module.exports =  {
-    maxThreads: 2,
     name: 'jojosmile',
-    workerScript:'./src/workers/JojoSmile_worker.js',
-    args: ['image_url']
+    args: ['image_url'],
+    filepath: './assets/images/jojo_smile.png'
 };

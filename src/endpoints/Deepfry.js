@@ -2,6 +2,7 @@ const sharp = require('sharp');
 const { Worker } = require('worker_threads');
 
 module.exports =  {
+    counter: 0,
     maxThreads: 3,
     name: 'deepfry',
     workerScript:'./src/workers/Deepfry_worker.js',

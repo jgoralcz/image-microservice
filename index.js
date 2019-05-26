@@ -1,6 +1,6 @@
 const express = require('express');
 const startFactory = require('./src/ExpressServiceFactory.js');
-// const Jimp = require('jimp');
+
 
 const app = express();
 app.use(express.json()); // we need to get the body in json format
@@ -16,5 +16,15 @@ app.use(express.json()); // we need to get the body in json format
 
 app.listen(9002);
 
+// parse args
+const args = process.argv.slice(2);
+let threads;
+if(!isNaN(args[0])) {
+    threads = parseInt(args[0]);
+}
+else {
+    console.error('No threads detected or not a number. Defaulting to 10.');
+}
+
 // start the factory with our app
-new startFactory(app);
+startFactory.init(app, threads);

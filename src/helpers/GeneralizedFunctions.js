@@ -7,7 +7,7 @@ module.exports = {
     /**
      *
      * @param image the user's image
-     * @param template my preloaded image
+     * @param buffer my preloaded image
      * @param templateX the template's X size
      * @param templateY the template's Y size
      * @param resizeX resize the user's image x direction
@@ -21,10 +21,11 @@ module.exports = {
      * @param doNotCompositeTwice whether or not to composite twice, true means do not do it
      * @returns {Promise<void>}
      */
-    modifyImageOverImage: async function (image, template, templateX, templateY, resizeX, resizeY, rotate, compositeX1,
+    modifyImageOverImage: async function (image, buffer, templateX, templateY, resizeX, resizeY, rotate, compositeX1,
                                           compositeY1, compositeX2, compositeY2, rotateFirst, doNotCompositeTwice) {
         try {
-
+            // read the template
+            const template = await Jimp.read(Buffer.from(buffer));
             const underImage = await new Jimp(templateX, templateY, 0x0);
 
             // read in our new image

@@ -1,6 +1,5 @@
 module.exports =  {
-    maxThreads: 2,
     name: 'phonememe',
-    workerScript:'./src/workers/PhoneMeme_worker.js',
-    args: ['image_url']
+    args: ['image_url'],
+    filepath: './assets/images/phone_meme.png'
 };

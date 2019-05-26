@@ -1,6 +1,7 @@
 const deepfry = require('./Deepfry.js');
 
 module.exports =  {
+    counter: 0,
     maxThreads: 2,
     name: 'overfry',
     workerScript:'./src/workers/Overfry_worker.js',
