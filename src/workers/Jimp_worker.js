@@ -14,6 +14,11 @@ const phoneMeme = require('./jimp/PhoneMeme_worker.js');
 const rdog = require('./jimp/Rdog_worker.js');
 const trumphold = require('./jimp/TrumpHold_worker.js');
 const noteImage = require('./jimp/NoteImage_worker.js');
+const top10anime = require('./jimp/Top10AnimeBattles_worker.js');
+const policeposter = require('./jimp/PolicePoster_worker.js');
+const payrespects = require('./jimp/PayRespects_worker.js');
+const mariojumping = require('./jimp/MarioJumping_worker.js');
+const sunnyframe = require('./jimp/SunnyFrame.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -77,6 +82,31 @@ if (!isMainThread) {
                 case 'noteimage':
                     buffer = await noteImage.execute(body.image_url, message.buffer);
                 break;
+
+                case 'top10animebattles':
+                case 'top10animesad':
+                case 'top10animebrutal':
+                case 'top10animebetrayal':
+                    buffer = await top10anime.execute(body.image_url, message.buffer);
+                break;
+
+                case 'policeposter':
+                    buffer = await policeposter.execute(body.image_url, message.buffer);
+                break;
+
+                case 'payrespects':
+                    buffer = await payrespects.execute(body.image_url, message.buffer);
+                break;
+
+                case 'mariojumping':
+                    buffer = await mariojumping.execute(body.image_url, message.buffer);
+                break;
+
+                case 'sunnyframe':
+                case 'sunnyframequote':
+                    buffer = await sunnyframe.execute(body.image_url, message.buffer);
+                break;
+
 
             }
         } catch (error) {

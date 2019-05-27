@@ -4,7 +4,7 @@ const fs = require('fs');
 const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 
-module.exports =  {
+module.exports = {
     name: 'notetext',
     file: './assets/images/noteText.jpg',
     args: ['text'],
