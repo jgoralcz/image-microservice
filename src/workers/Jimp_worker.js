@@ -18,7 +18,10 @@ const top10anime = require('./jimp/Top10AnimeBattles_worker.js');
 const policeposter = require('./jimp/PolicePoster_worker.js');
 const payrespects = require('./jimp/PayRespects_worker.js');
 const mariojumping = require('./jimp/MarioJumping_worker.js');
-const sunnyframe = require('./jimp/SunnyFrame.js');
+const sunnyframe = require('./jimp/SunnyFrame_worker.js');
+const loveher = require('./jimp/LoveHer_worker.js');
+const dio = require('./jimp/Dio_worker.js');
+const dateline = require('./jimp/Dateline_worker.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -105,6 +108,18 @@ if (!isMainThread) {
                 case 'sunnyframe':
                 case 'sunnyframequote':
                     buffer = await sunnyframe.execute(body.image_url, message.buffer);
+                break;
+
+                case 'loveher':
+                    buffer = await loveher.execute(body.image_url, message.buffer);
+                break;
+
+                case 'dio':
+                    buffer = await dio.execute(body.image_url, message.buffer);
+                break;
+
+                case 'dateline':
+                    buffer = await dateline.execute(body.image_url, message.buffer);
                 break;
 
 
