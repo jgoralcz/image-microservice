@@ -13,7 +13,7 @@ module.exports = {
      * @param app the express app
      * @param numThreads the number of worker threads.
      */
-    init: function (app, numThreads) {
+    init(app, numThreads) {
         this.dir = './src' + this.endpoints;
         this.expressApp = app;
         this.maxThreads = numThreads;
@@ -26,7 +26,7 @@ module.exports = {
      * This is because Node-Canvas and Sharp use their own threading.
      * Additionally, it's up to the user if they want to add their own.
      */
-    createServicesAndWorkers: function () {
+    createServicesAndWorkers() {
 
         // create new worker threads based off their specification for the main script
         // this script does not use node-canvas or sharp because they use their own threading.
@@ -81,21 +81,14 @@ module.exports = {
      * @param workerMessageListener the worker listener to override if one is provided.
      */
     expressLogic(req, res, module, workerMessageListener) {
+
         // json body needed
         const body = req.body;
 
-        // check the body to make sure we have the right args
-        for(let i = 0; i < module.args.length; i++) {
-            let arg = module.args[i];
+        // check for correct params
+        const valid = this.checkValidParams(res, body, module);
+        if(!valid) return;
 
-            // no body with this argument, bad input
-            if(!body[arg]) {
-                res.status(400);
-                res.contentType('application/json');
-                res.send(`{"error": "Incorrect Parameters met. Needs: ${module.args}"}`);
-                return;
-            }
-        }
 
         // simple way of queueing the threads
         this.counter++;
@@ -118,6 +111,9 @@ module.exports = {
 
         // no listener, add our own
         if(workerMessageListener) {
+            module.workerMessageListener(req, res, worker);
+        }
+        else {
             // listen for message back, which is hopefully a buffer image.
             worker.once('message', (buffer) => {
 
@@ -134,13 +130,34 @@ module.exports = {
                 }
             });
         }
-        else {
-            module.workerMessageListener(req, res, worker);
-        }
-
 
         // send the message
         worker.postMessage({endpoint: module.name, body: body, buffer: module.buffer});
+    },
+
+    /**
+     * checks for valid parameters
+     * @param res the response object.
+     * @param body the body of the request
+     * @param args the module's args to test against
+     * @returns {boolean}
+     */
+    checkValidParams(res, body, args) {
+
+        // check the body to make sure we have the right args
+        for(let i = 0; i < args.length; i++) {
+            let arg = args[i];
+
+            // no body with this argument, bad input
+            if(!body[arg]) {
+                res.status(400);
+                res.contentType('application/json');
+                res.send(`{"error": "Incorrect Parameters met. Needs: ${args}"}`);
+                return false;
+            }
+        }
+
+        return true;
     }
 };
 

@@ -1,7 +1,6 @@
 const express = require('express');
 const startFactory = require('./src/ExpressServiceFactory.js');
 
-
 const app = express();
 app.use(express.json()); // we need to get the body in json format
 
@@ -18,7 +17,7 @@ app.listen(9002);
 
 // parse args
 const args = process.argv.slice(2);
-let threads = 50;
+let threads = 10;
 if(!isNaN(args[0])) {
     threads = parseInt(args[0]);
 }

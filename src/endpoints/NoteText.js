@@ -1,12 +1,12 @@
 const { checkValidParams } = require('../ExpressServiceFactory.js');
-const worker = require('../workers/canvas/ChangeMyMind_worker.js');
+const worker = require('../workers/canvas/NoteText_worker.js');
 const fs = require('fs');
 const { promisify } = require('util');
 const readFileAsync = promisify(fs.readFile);
 
 module.exports =  {
-    name: 'changemymind',
-    file: './assets/images/changemymind_template.jpg',
+    name: 'notetext',
+    file: './assets/images/noteText.jpg',
     args: ['text'],
 
     /**

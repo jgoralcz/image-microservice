@@ -1,9 +1,8 @@
-const gf = require('../helpers/GeneralizedFunctions.js');
+const gf = require('../../helpers/GeneralizedFunctions.js');
 
 module.exports = {
-    x: 1021,
-    y: 1200,
-    rotate: -14,
+    x: 469,
+    y: 700,
 
     /**
      * generates the image.
@@ -12,6 +11,6 @@ module.exports = {
      * @returns {Promise<void>}
      */
     execute: async function(image_url, buffer) {
-        return await gf.modifyImageOverImage(image_url, buffer, this.x, this.y, 400, 600, this.rotate, 550, 600, 0, 0);
+        return await gf.modifyImageOverImage(image_url, buffer, this.x, this.y, 105, 115, 0, 220, 130, 0, 0);
     }
 };
