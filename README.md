@@ -6,3 +6,6 @@ If your node version is less than 11.5 you must use `node --experimental-worker 
 node-canvas version 1.6.13
 Jimp@latest
 Sharp@latest
+
+To install docker on linux: `curl -sSL https://get.docker.com/ | bash`
+Otherwise, look it up.

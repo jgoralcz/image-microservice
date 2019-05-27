@@ -48,7 +48,7 @@ module.exports = {
             if(!endpoint.initService) {
                 this.initService(endpoint);
 
-                // use our own initService
+                // get our buffer
                 if(endpoint.filepath != null) {
                     const file = fs.readFileSync(endpoint.filepath);
                     endpoint.buffer = Buffer.from(file);

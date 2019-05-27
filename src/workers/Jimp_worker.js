@@ -25,6 +25,9 @@ const dateline = require('./jimp/Dateline_worker.js');
 const nope = require('./jimp/Nope_worker.js');
 const hot = require('./jimp/Hot_worker.js');
 const jojowallet = require('./jimp/JojoWallet_worker.js');
+const ihadto = require('./jimp/IHadTo_worker.js');
+const vsauce = require('./jimp/VSauce_worker.js');
+const hatkidsays = require('./jimp/HatKidSays_worker.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -135,6 +138,19 @@ if (!isMainThread) {
 
                 case 'hot':
                     buffer = await hot.execute(body.image_url, message.buffer);
+                break;
+
+                case 'ihadto':
+                    buffer = await ihadto.execute(body.image_url, message.buffer);
+                break;
+
+                case 'vsauce':
+                    buffer = await vsauce.execute(body.image_url, message.buffer);
+                break;
+
+                case 'hatkidsays':
+                case 'hatkidsayssmug':
+                    buffer = await hatkidsays.execute(body.text, message.buffer);
                 break;
 
 
