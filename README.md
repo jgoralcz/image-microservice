@@ -9,3 +9,7 @@ Sharp@latest
 
 To install docker on linux: `curl -sSL https://get.docker.com/ | bash`
 Otherwise, look it up.
+
+
+P.S.: Don't use jimp. Despite this microservice providing workers using jimp, canvas and sharp are much faster (maybe 40$ faster?).
+If you have the option, use canvas.

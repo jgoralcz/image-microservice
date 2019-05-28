@@ -1,5 +1,5 @@
 const Jimp = require('jimp');
-const ofp = require('../../helpers/OverfriedHelper');
+const ofp = require('../WorkerHelpers/OverfriedHelper');
 
 module.exports = {
 

@@ -1,4 +1,4 @@
-const gf = require('../../helpers/GeneralizedFunctions.js');
+const gf = require('../WorkerHelpers/GeneralizedFunctions.js');
 
 module.exports = {
     rotate: -14,

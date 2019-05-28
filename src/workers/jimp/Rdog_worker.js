@@ -9,7 +9,7 @@ module.exports = {
      * @returns {Promise<void>}
      */
     execute: async function(text, buffer) {
-        const template = await Jimp.read(buffer[0]);
+        const template = await Jimp.read(Buffer.from(buffer[0]));
         const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
 
         buffer = await template.print(font, 350, 25, text, 280);

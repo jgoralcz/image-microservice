@@ -1,6 +1,6 @@
-const line = require('../../helpers/GetLinesHelper.js');
+const line = require('../WorkerHelpers/GetLinesHelper.js');
 const { createCanvas, Image } = require('canvas');
-const { formatTwitterTime } = require('../../helpers/FormatTwitterTime.js');
+const { formatTwitterTime } = require('../WorkerHelpers/FormatTwitterTime.js');
 
 
 module.exports = {

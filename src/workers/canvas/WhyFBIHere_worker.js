@@ -1,6 +1,5 @@
 const { createCanvas, Image } = require('canvas');
 
-
 module.exports = {
     /**
      * gets the buffer from canvas

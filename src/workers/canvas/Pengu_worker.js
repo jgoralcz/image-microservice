@@ -1,4 +1,4 @@
-const line = require('../../helpers/GetLinesHelper.js');
+const line = require('../WorkerHelpers/GetLinesHelper.js');
 const { createCanvas, Image } = require('canvas');
 
 
