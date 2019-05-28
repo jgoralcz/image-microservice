@@ -33,6 +33,8 @@ const blurpify = require('./jimp/Blurpify_worker.js');
 const sonicsays = require('./jimp/SonicSays_worker.js');
 const jpegify = require('./jimp/Jpegify_worker.js');
 const homie = require('./jimp/Homie_worker.js');
+const bazinga = require('./jimp/Bazinga_worker.js');
+const blur = require('./jimp/Blur_worker.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -159,7 +161,7 @@ if (!isMainThread) {
                 break;
 
                 case 'halloweenify':
-                    buffer = await halloweenify.execute(body.image_url, parseInt(body.threshold || 0));
+                    buffer = await halloweenify.execute(body.image_url, parseInt(body.threshold || 1));
                 break;
 
                 case 'blurpify':
@@ -177,6 +179,15 @@ if (!isMainThread) {
                 case 'homie':
                     buffer = await homie.execute(body.image_url, message.buffer);
                 break;
+
+                case 'bazinga':
+                    buffer = await bazinga.execute(body.image_url, message.buffer);
+                break;
+
+                case 'blur':
+                    buffer = await blur.execute(body.image_url, parseInt(body.number || 1));
+                break;
+
 
             }
         } catch (error) {
