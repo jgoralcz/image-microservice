@@ -3,7 +3,7 @@ const worker = require('../workers/canvas/NoteText_worker.js');
 
 module.exports = {
     name: 'notetext',
-    filepath: './assets/images/noteText.jpg',
+    filepaths: ['./assets/images/noteText.jpg'],
     args: ['text'],
 
     /**

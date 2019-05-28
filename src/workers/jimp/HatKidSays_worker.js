@@ -13,7 +13,7 @@ module.exports = {
     execute: async function(text, buffer) {
         try {
             //load images and font
-            let img = await Jimp.read(Buffer.from(buffer));
+            let img = await Jimp.read(Buffer.from(buffer[0]));
             const font = await Jimp.loadFont(this.font);
 
             // print and return new buffer

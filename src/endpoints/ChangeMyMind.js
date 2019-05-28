@@ -3,7 +3,7 @@ const tweet = require('../EndpointsHelper/GenericCanvas.js');
 
 module.exports =  {
     name: 'changemymind',
-    filepath: './assets/images/changemymind_template.jpg',
+    filepath: ['./assets/images/changemymind_template.jpg'],
     args: ['text'],
 
     /**

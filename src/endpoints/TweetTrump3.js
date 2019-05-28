@@ -4,7 +4,7 @@ const worker = require('../workers/canvas/TweetPerson_worker.js');
 module.exports =  {
     name: 'trumptweet3',
     args: ['text'],
-    filepath: './assets/images/trumptweet3.jpg',
+    filepaths: ['./assets/images/trumptweet3.jpg'],
     maxChars: 156,
 
     /**

@@ -1,5 +1,5 @@
 module.exports =  {
     name: 'jojosmile',
     args: ['image_url'],
-    filepath: './assets/images/jojo_smile.png'
+    filepaths: ['./assets/images/jojo_smile.png']
 };

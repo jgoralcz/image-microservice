@@ -29,7 +29,7 @@ module.exports = {
             }
 
             // first process the image
-            const buffer = await worker.getCanvasBuffer(module.buffer, body.text);
+            const buffer = await worker.getCanvasBuffer(module.buffers, body.text);
 
             // make sure we have an uint8array
             if (buffer instanceof Uint8Array) {

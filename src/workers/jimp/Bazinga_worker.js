@@ -12,7 +12,7 @@ module.exports = {
 
     execute: async function(image_url, buffer) {
         try {
-            let overlay = await Jimp.read(Buffer.from(buffer));
+            let overlay = await Jimp.read(Buffer.from(buffer[0]));
 
             //make new image and resize if necessary
             let newImage = await Jimp.read(image_url);

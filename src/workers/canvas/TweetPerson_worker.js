@@ -6,15 +6,15 @@ const { formatTwitterTime } = require('../../helpers/FormatTwitterTime.js');
 module.exports = {
     /**
      * gets the buffer from canvas
-     * @param image our image
+     * @param images our image
      * @param text the user's text
      * @returns {Promise<*>}
      */
-    getCanvasBuffer: async (image, text) => {
+    getCanvasBuffer: async (images, text) => {
 
         try {
             let img = new Image();
-            img.src = image;
+            img.src = images[0];
 
             //get dimensions and specify it's 2d
             let canvas = createCanvas(img.width, img.height);

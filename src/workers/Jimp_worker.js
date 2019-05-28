@@ -48,11 +48,11 @@ if (!isMainThread) {
             switch(endpoint) {
 
                 case 'bodypillow':
-                    buffer = await bodypillow.execute(body.image_url, message.buffer);
+                    buffer = await bodypillow.execute(body.image_url, message.buffers);
                 break;
 
                 case 'bodypillowmale':
-                    buffer = await bodypillowMale.execute(body.image_url, message.buffer);
+                    buffer = await bodypillowMale.execute(body.image_url, message.buffers);
                 break;
 
                 case 'deepfry':
@@ -68,96 +68,96 @@ if (!isMainThread) {
                 break;
 
                 case 'jojokira':
-                    buffer = await jojoKira.execute(body.image_url, message.buffer);
+                    buffer = await jojoKira.execute(body.image_url, message.buffers);
                 break;
 
                 case 'jojoshock':
-                    buffer = await jojoShock.execute(body.image_url, message.buffer);
+                    buffer = await jojoShock.execute(body.image_url, message.buffers);
                 break;
 
                 case 'jojosmash':
-                    buffer = await jojoSmash.execute(body.image_url, message.buffer);
+                    buffer = await jojoSmash.execute(body.image_url, message.buffers);
                 break;
 
                 case 'jojosmile':
-                    buffer = await jojoSmile.execute(body.image_url, message.buffer);
+                    buffer = await jojoSmile.execute(body.image_url, message.buffers);
                 break;
 
                 case 'phonememe':
-                    buffer = await phoneMeme.execute(body.image_url, message.buffer);
+                    buffer = await phoneMeme.execute(body.image_url, message.buffers);
                 break;
 
                 case 'rdog':
-                    buffer = await rdog.execute(body.text, message.buffer);
+                    buffer = await rdog.execute(body.text, message.buffers);
                 break;
 
                 case 'trumphold':
-                    buffer = await trumphold.execute(body.image_url, message.buffer);
+                    buffer = await trumphold.execute(body.image_url, message.buffers);
                 break;
 
                 case 'noteimage':
-                    buffer = await noteImage.execute(body.image_url, message.buffer);
+                    buffer = await noteImage.execute(body.image_url, message.buffers);
                 break;
 
                 case 'top10animebattles':
                 case 'top10animesad':
                 case 'top10animebrutal':
                 case 'top10animebetrayal':
-                    buffer = await top10anime.execute(body.image_url, message.buffer);
+                    buffer = await top10anime.execute(body.image_url, message.buffers);
                 break;
 
                 case 'policeposter':
-                    buffer = await policeposter.execute(body.image_url, message.buffer);
+                    buffer = await policeposter.execute(body.image_url, message.buffers);
                 break;
 
                 case 'payrespects':
-                    buffer = await payrespects.execute(body.image_url, message.buffer);
+                    buffer = await payrespects.execute(body.image_url, message.buffers);
                 break;
 
                 case 'mariojumping':
-                    buffer = await mariojumping.execute(body.image_url, message.buffer);
+                    buffer = await mariojumping.execute(body.image_url, message.buffers);
                 break;
 
                 case 'sunnyframe':
                 case 'sunnyframequote':
-                    buffer = await sunnyframe.execute(body.image_url, message.buffer);
+                    buffer = await sunnyframe.execute(body.image_url, message.buffers);
                 break;
 
                 case 'loveher':
-                    buffer = await loveher.execute(body.image_url, message.buffer);
+                    buffer = await loveher.execute(body.image_url, message.buffers);
                 break;
 
                 case 'dio':
-                    buffer = await dio.execute(body.image_url, message.buffer);
+                    buffer = await dio.execute(body.image_url, message.buffers);
                 break;
 
                 case 'dateline':
-                    buffer = await dateline.execute(body.image_url, message.buffer);
+                    buffer = await dateline.execute(body.image_url, message.buffers);
                 break;
 
                 case 'nope':
-                    buffer = await nope.execute(body.image_url, message.buffer);
+                    buffer = await nope.execute(body.image_url, message.buffers);
                 break;
 
                 case 'jojowallet':
-                    buffer = await jojowallet.execute(body.image_url, message.buffer);
+                    buffer = await jojowallet.execute(body.image_url, message.buffers);
                 break;
 
                 case 'hot':
-                    buffer = await hot.execute(body.image_url, message.buffer);
+                    buffer = await hot.execute(body.image_url, message.buffers);
                 break;
 
                 case 'ihadto':
-                    buffer = await ihadto.execute(body.image_url, message.buffer);
+                    buffer = await ihadto.execute(body.image_url, message.buffers);
                 break;
 
                 case 'vsauce':
-                    buffer = await vsauce.execute(body.image_url, message.buffer);
+                    buffer = await vsauce.execute(body.image_url, message.buffers);
                 break;
 
                 case 'hatkidsays':
                 case 'hatkidsayssmug':
-                    buffer = await hatkidsays.execute(body.text, message.buffer);
+                    buffer = await hatkidsays.execute(body.text, message.buffers);
                 break;
 
                 case 'halloweenify':
@@ -169,7 +169,7 @@ if (!isMainThread) {
                 break;
 
                 case 'sonicsays':
-                    buffer = await sonicsays.execute(body.text, message.buffer);
+                    buffer = await sonicsays.execute(body.text, message.buffers);
                 break;
 
                 case 'jpegify':
@@ -177,11 +177,11 @@ if (!isMainThread) {
                 break;
 
                 case 'homie':
-                    buffer = await homie.execute(body.image_url, message.buffer);
+                    buffer = await homie.execute(body.image_url, message.buffers);
                 break;
 
                 case 'bazinga':
-                    buffer = await bazinga.execute(body.image_url, message.buffer);
+                    buffer = await bazinga.execute(body.image_url, message.buffers);
                 break;
 
                 case 'blur':

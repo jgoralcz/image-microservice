@@ -10,6 +10,6 @@ module.exports = {
      * @returns {Promise<void>}
      */
     execute: async function(image_url, buffer) {
-        return await gf.modifyImageOverImage(image_url, buffer, 400, 600, this.rotate, 500, 600, 0, 0);
+        return await gf.modifyImageOverImage(image_url, buffer[0], 400, 600, this.rotate, 500, 600, 0, 0);
     }
 };

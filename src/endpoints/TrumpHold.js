@@ -1,5 +1,5 @@
 module.exports =  {
     name: 'trumphold',
     args: ['image_url'],
-    filepath: './assets/images/trumphold.png'
+    filepaths: ['./assets/images/trumphold.png']
 };

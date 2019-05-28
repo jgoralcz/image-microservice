@@ -5,16 +5,16 @@ const { createCanvas, Image } = require('canvas');
 module.exports = {
     /**
      * gets the buffer from canvas
-     * @param image buffer image
+     * @param images buffer image
      * @param text the user's text
      * @returns {Promise<*>}
      */
-    getCanvasBuffer: async (image, text) => {
+    getCanvasBuffer: async (images, text) => {
 
         try {
             //load image as node-canvas data
             let img = new Image();
-            img.src = image;
+            img.src = images[0]
 
             //get dimensions and specify it's 2d
             let canvas = createCanvas(img.width, img.height);

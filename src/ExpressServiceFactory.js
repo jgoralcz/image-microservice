@@ -45,9 +45,12 @@ module.exports = {
             const endpoint = require('.' + this.endpoints + file);
 
             // add buffer to our endpoint
-            if(endpoint.filepath != null) {
-                const file = fs.readFileSync(endpoint.filepath);
-                endpoint.buffer = Buffer.from(file);
+            if(endpoint.filepaths != null) {
+                endpoint.buffers = [];
+                for(let i = 0; i < endpoint.filepaths.length; i++) {
+                    const file = fs.readFileSync(endpoint.filepaths[i]);
+                    endpoint.buffers.push(Buffer.from(file));
+                }
             }
 
             // if we don't have an overriding initService, then let's use ours
@@ -132,7 +135,7 @@ module.exports = {
         }
 
         // send the message
-        worker.postMessage({endpoint: module.name, body: body, buffer: module.buffer});
+        worker.postMessage({endpoint: module.name, body: body, buffers: module.buffers});
     },
 
     /**

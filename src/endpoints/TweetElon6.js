@@ -4,7 +4,7 @@ const worker = require('../workers/canvas/TweetPerson_worker.js');
 module.exports =  {
     name: 'elontweet6',
     args: ['text'],
-    filepath: './assets/images/elontweet6.jpg',
+    filepaths: ['./assets/images/elontweet6.jpg'],
 
     /**
      * initiates the service
