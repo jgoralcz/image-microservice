@@ -126,6 +126,12 @@ module.exports = {
                     res.contentType('image/jpg');
                     res.send(Buffer.from(buffer));
                 }
+                // send string if we have that (for ascii images or url)
+                else if(typeof buffer === 'string' || buffer instanceof String) {
+                    res.status(200);
+                    res.contentType('application/json');
+                    res.send(`{"content": "${buffer}"}`);
+                }
                 else {
                     res.status(500);
                     res.contentType('application/json');

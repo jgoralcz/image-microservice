@@ -1,4 +1,4 @@
-const tweet = require('../EndpointsHelper/GenericCanvas.js');
+const gc = require('../EndpointsHelper/GenericCanvas.js');
 const worker = require('../workers/canvas/TweetPerson_worker.js');
 
 module.exports =  {
@@ -12,6 +12,6 @@ module.exports =  {
      * @param expressApp the express app.
      */
     initService(module, expressApp) {
-        tweet.initService(module, expressApp, worker);
+        gc.initService(module, expressApp, worker);
     }
 };

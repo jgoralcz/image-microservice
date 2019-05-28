@@ -1,5 +1,5 @@
 const worker = require('../workers/canvas/TrumpLaw_worker.js');
-const tweet = require('../EndpointsHelper/GenericCanvas.js');
+const gc = require('../EndpointsHelper/GenericCanvas.js');
 
 module.exports =  {
     name: 'trumplaw',
@@ -12,6 +12,6 @@ module.exports =  {
      * @param expressApp the express app.
      */
     initService(module, expressApp) {
-        tweet.initService(module, expressApp, worker);
+        gc.initService(module, expressApp, worker);
     }
 };

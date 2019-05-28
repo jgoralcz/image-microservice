@@ -35,6 +35,7 @@ const jpegify = require('./jimp/Jpegify_worker.js');
 const homie = require('./jimp/Homie_worker.js');
 const bazinga = require('./jimp/Bazinga_worker.js');
 const blur = require('./jimp/Blur_worker.js');
+const ascii = require('./jimp/Ascii_worker.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -186,6 +187,10 @@ if (!isMainThread) {
 
                 case 'blur':
                     buffer = await blur.execute(body.image_url, parseInt(body.number || 1));
+                break;
+
+                case 'ascii':
+                    buffer = await ascii.execute(body.image_url);
                 break;
 
 
