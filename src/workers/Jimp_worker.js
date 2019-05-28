@@ -30,6 +30,9 @@ const vsauce = require('./jimp/VSauce_worker.js');
 const hatkidsays = require('./jimp/HatKidSays_worker.js');
 const halloweenify = require('./jimp/Halloweenify_worker.js');
 const blurpify = require('./jimp/Blurpify_worker.js');
+const sonicsays = require('./jimp/SonicSays_worker.js');
+const jpegify = require('./jimp/Jpegify_worker.js');
+const homie = require('./jimp/Homie_worker.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -163,6 +166,17 @@ if (!isMainThread) {
                     buffer = await blurpify.execute(body.image_url);
                 break;
 
+                case 'sonicsays':
+                    buffer = await sonicsays.execute(body.text, message.buffer);
+                break;
+
+                case 'jpegify':
+                    buffer = await jpegify.execute(body.image_url);
+                break;
+
+                case 'homie':
+                    buffer = await homie.execute(body.image_url, message.buffer);
+                break;
 
             }
         } catch (error) {
