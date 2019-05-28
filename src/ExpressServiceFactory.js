@@ -21,8 +21,8 @@ module.exports = {
     },
 
     /**
-     * Creates the services and workers by looping over each file.
-     * If a file has its own initService, we ignore it, and run theirs instead.
+     * Creates the services and workers by looping over each filepath.
+     * If a filepath has its own initService, we ignore it, and run theirs instead.
      * This is because Node-Canvas and Sharp use their own threading.
      * Additionally, it's up to the user if they want to add their own.
      */
@@ -41,18 +41,18 @@ module.exports = {
 
         // loop through files, sync so we can get it over with
         fs.readdirSync(this.dir).forEach( async file =>  {
-            // require the file then initialize the service.
+            // require the filepath then initialize the service.
             const endpoint = require('.' + this.endpoints + file);
+
+            // add buffer to our endpoint
+            if(endpoint.filepath != null) {
+                const file = fs.readFileSync(endpoint.filepath);
+                endpoint.buffer = Buffer.from(file);
+            }
 
             // if we don't have an overriding initService, then let's use ours
             if(!endpoint.initService) {
                 this.initService(endpoint);
-
-                // get our buffer
-                if(endpoint.filepath != null) {
-                    const file = fs.readFileSync(endpoint.filepath);
-                    endpoint.buffer = Buffer.from(file);
-                }
             }
             else {
                 await endpoint.initService(endpoint, this.expressApp, serviceObj);

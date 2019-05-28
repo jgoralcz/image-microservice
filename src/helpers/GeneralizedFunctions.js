@@ -82,7 +82,7 @@ module.exports = {
      * @param rotateFirst
      * @returns {Promise<void>}
      */
-    modifyOverImage: async (image, buffer, resizeX, resizeY, rotate, compositeX1, compositeY1, rotateFirst) => {
+    modifyOverImage: async function (image, buffer, resizeX, resizeY, rotate, compositeX1, compositeY1, rotateFirst)  {
         try {
             const overlay = await Jimp.read(Buffer.from(buffer));
 

@@ -1,10 +1,10 @@
-const worker = require('../workers/canvas/ChangeMyMind_worker.js');
 const tweet = require('../EndpointsHelper/GenericCanvas.js');
+const worker = require('../workers/canvas/TweetPerson_worker.js');
 
 module.exports =  {
-    name: 'changemymind',
-    filepath: './assets/images/changemymind_template.jpg',
+    name: 'trumptweet6',
     args: ['text'],
+    filepath: './assets/images/trumptweet6.jpg',
 
     /**
      * initiates the service
