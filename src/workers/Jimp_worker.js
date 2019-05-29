@@ -36,6 +36,12 @@ const homie = require('./jimp/Homie_worker.js');
 const bazinga = require('./jimp/Bazinga_worker.js');
 const blur = require('./jimp/Blur_worker.js');
 const ascii = require('./jimp/Ascii_worker.js');
+const imgtobase64 = require('./jimp/IMGToBase64_worker.js');
+const giftobase64 = require('./jimp/GifToBase64_worker.js');
+const qrcodetext = require('./jimp/qrCode_worker.js');
+const pixelate = require('./jimp/Pixelate_worker.js');
+const loadBuffer = require('./jimp/LoadBuffer_worker.js');
+const saveImage = require('./jimp/SaveImage_worker.js');
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -193,7 +199,29 @@ if (!isMainThread) {
                     buffer = await ascii.execute(body.image_url);
                 break;
 
+                case 'imgtobase64':
+                    buffer = await imgtobase64.execute(body.image_url);
+                break;
 
+                case 'giftobase64':
+                    buffer = await giftobase64.execute(body.image_url);
+                break;
+
+                case 'qrcodetext':
+                    buffer = await qrcodetext.execute(body.image_url);
+                break;
+
+                case 'pixelate':
+                    buffer = await pixelate.execute(body.image_url);
+                break;
+
+                case 'sharpen':
+                    buffer = await loadBuffer.execute(body.image_url);
+                break;
+
+                case 'saveimage':
+                    buffer = await saveImage.execute(body.image_url, body.file_name);
+                break;
             }
         } catch (error) {
             console.error(error);
