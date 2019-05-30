@@ -105,7 +105,7 @@ module.exports = {
                 newImage.scale(this.unscale);
             }
 
-            //modify the image and then the buffer
+            // modify the image and then the buffer
             let content = await newImage.composite(overlay, compositeX1, compositeY1);
 
             return await content.getBufferAsync(Jimp.MIME_JPEG);

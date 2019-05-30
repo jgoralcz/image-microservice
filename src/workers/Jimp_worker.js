@@ -42,6 +42,10 @@ const qrcodetext = require('./jimp/qrCode_worker.js');
 const pixelate = require('./jimp/Pixelate_worker.js');
 const loadBuffer = require('./jimp/LoadBuffer_worker.js');
 const saveImage = require('./jimp/SaveImage_worker.js');
+const wtfPoe = require('./jimp/WtfPoe_worker.js');
+const bongocattop = require('./jimp/BongoCatTop_worker.js');
+const pregnant = require('./jimp/Pregnant_worker.js');
+
 
 // check that the sorter was called as a worker thread
 if (!isMainThread) {
@@ -222,6 +226,20 @@ if (!isMainThread) {
                 case 'saveimage':
                     buffer = await saveImage.execute(body.image_url, body.file_name);
                 break;
+
+                case 'wtfpoe':
+                    buffer = await wtfPoe.execute(body.image_url, message.buffers);
+                break;
+
+                case 'bongocattop':
+                case 'bongocatmiddle':
+                    buffer = await bongocattop.execute(body.image_url, message.buffers);
+                break;
+
+                case 'pregnant':
+                    buffer = await pregnant.execute(body.image_url, message.buffers);
+                break;
+
             }
         } catch (error) {
             console.error(error);
