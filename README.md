@@ -34,59 +34,32 @@ the correct `args` provided. In other words, look into each file under `/src/end
 
 ### Examples
 
-1) The `hot` endpoint requires the `image_url`
+1) The `hot` endpoint requires the `image_url` \
+localhost:9002/api/hot
     ```$xslt
-    POST: localhost:9002/api/hot
     POST /api/hot HTTP/1.1
     Host: localhost:9002
     Content-Type: application/json
-    User-Agent: PostmanRuntime/7.11.0
-    Accept: */*
-    Cache-Control: no-cache
-    Host: localhost:9002
-    cookie: ROUTEID=.2
-    accept-encoding: gzip, deflate
-    content-length: 82
-    Connection: keep-alive
-    cache-control: no-cache
     
     {"image_url": "https://pbs.twimg.com/media/DtwaeFtUwAAPbxk.jpg"}
     ```
 
-2) The `hatkidsays` endpoint requires text
+2) The `hatkidsays` endpoint requires text \
+localhost:9002/api/hatkidsays
     ```$xslt
-    POST: localhost:9002/api/hatkidsays
     POST /api/hatkidsays HTTP/1.1
     Host: localhost:9002
     Content-Type: application/json
-    User-Agent: PostmanRuntime/7.11.0
-    Accept: */*
-    Cache-Control: no-cache
-    Host: localhost:9002
-    cookie: ROUTEID=.2
-    accept-encoding: gzip, deflate
-    content-length: 82
-    Connection: keep-alive
-    cache-control: no-cache
     
     {"text": "Make sure you brush your teeth!"}
     ```
-3) The `halloweenify` endpoint requires an image url and a threshold.
+3) The `halloweenify` endpoint requires an image url and a threshold. \
+localhost:9002/api/halloweenify
 
     ```$xslt
     POST /api/halloweenify HTTP/1.1
     Host: localhost:9002
     Content-Type: application/json
-    User-Agent: PostmanRuntime/7.11.0
-    Accept: */*
-    Cache-Control: no-cache
-    Postman-Token: 6c8fe42a-8ec2-400c-a0d0-899c898e0dca,9c62ecfc-5172-4944-a714-0f12e6bde5af
-    Host: localhost:9002
-    cookie: ROUTEID=.2
-    accept-encoding: gzip, deflate
-    content-length: 82
-    Connection: keep-alive
-    cache-control: no-cache
 
     {"image_url": "https://pbs.twimg.com/media/DtwaeFtUwAAPbxk.jpg", "threshold": "1"}
     ```
