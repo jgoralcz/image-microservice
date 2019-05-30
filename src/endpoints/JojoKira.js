@@ -1,6 +1,5 @@
 module.exports =  {
-    maxThreads: 2,
     name: 'jojokira',
-    workerScript:'./src/workers/JojoKira_worker.js',
-    args: ['image_url']
+    args: ['image_url'],
+    filepaths: ['./assets/images/jojo_kira.png']
 };

@@ -1,6 +1,5 @@
 module.exports =  {
-    maxThreads: 2,
     name: 'trumphold',
-    workerScript:'./src/workers/TrumpHold_worker.js',
-    args: ['image_url']
+    args: ['image_url'],
+    filepaths: ['./assets/images/trumphold.png']
 };

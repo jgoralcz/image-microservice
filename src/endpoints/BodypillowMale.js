@@ -1,6 +1,5 @@
 module.exports =  {
-    maxThreads: 2,
     name: 'bodypillowmale',
-    workerScript:'./src/workers/BodypillowMale_worker.js',
-    args: ['image_url']
+    args: ['image_url'],
+    filepaths: ['./assets/images/bodypillowmalezoom.png']
 };
