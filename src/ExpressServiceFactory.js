@@ -89,7 +89,7 @@ module.exports = {
         const body = req.body;
 
         // check for correct params
-        const valid = this.checkValidParams(res, body, module);
+        const valid = this.checkValidParams(res, body, module.args);
         if(!valid) return;
 
 
@@ -103,6 +103,7 @@ module.exports = {
             // create a new worker.
             this.workerArray[this.counter] = createWorker(this.jimpScript);
 
+            console.log(this.workerArray);
             // check if it's still null
             if(worker == null) {
                 res.status(500);
