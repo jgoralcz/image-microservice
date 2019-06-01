@@ -73,7 +73,7 @@ My only request is to follow the current structure that is provided and make sur
 ___
 
 ## After thoughts: 
-Don't use Jimp. Despite this microservice providing workers using Jimp, Canvas and Sharp are much faster (maybe 40% faster?).
-If you have the option, use canvas. Canvas (and Sharp) do not block the thread and use an external library to process images, making it much faster.
+Use Jimp until node-canvas gets worker threads support. Despite this microservice providing workers using Jimp, Canvas and Sharp are much faster (maybe 40% faster?).
+If you have the option in the future (when worker threads are hopefully supported by canvas), use canvas. Canvas (and Sharp) do not block the thread and use an external library to process images, making it much faster.
 
 
