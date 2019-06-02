@@ -162,10 +162,11 @@ module.exports = {
  * @returns {Promise<void>}
  */
 const createWorker = (script, responses) => {
-    const worker = fork(script, [], {stdio: 'inherit'});
+    const worker = fork(script, []);
 
     // listen for message back, which is hopefully a buffer image.
     worker.on('message', (message) => {
+        //TODO: if not message.buffer, send 500 cut out our response
         let buffer = message.buffer.data;
         const requestNum = message.requestNum;
 

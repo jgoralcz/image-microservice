@@ -47,8 +47,14 @@ const wtfPoe = require('./jimp/WtfPoe_worker.js');
 const bongocattop = require('./jimp/BongoCatTop_worker.js');
 const pregnant = require('./jimp/Pregnant_worker.js');
 
+// canvas
 const cmm = require('../workers/canvas/ChangeMyMind_worker.js');
-
+const achievement = require('../workers/canvas/Achievement_worker.js');
+const noteText = require('../workers/canvas/NoteText_worker.js');
+const pengu = require('../workers/canvas/Pengu_worker.js');
+const trumpLaw = require('../workers/canvas/TrumpLaw_worker.js');
+const tweetPerson = require('../workers/canvas/TweetPerson_worker.js');
+const whyFBIHere = require('../workers/canvas/WhyFBIHere_worker.js');
 
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
@@ -252,6 +258,30 @@ process.on('message', async (message) => {
             case 'changemymind':
                 buffer = await cmm.getCanvasBuffer(message.buffers, body.text);
             break;
+
+            case 'achievement':
+                buffer = await achievement.getCanvasBuffer(message.buffers, body.text);
+            break;
+
+            case 'notetext':
+                buffer = await noteText.getCanvasBuffer(message.buffers, body.text);
+            break;
+
+            case 'pengu':
+                buffer = await pengu.getCanvasBuffer(message.buffers, body.text);
+            break;
+
+            case 'trumplaw':
+                buffer = await trumpLaw.getCanvasBuffer(message.buffers, body.text);
+            break;
+
+            case 'elontweet':
+            case 'trumptweet':
+                buffer = await tweetPerson.getCanvasBuffer(message.buffers, body.text);
+            break;
+
+            case 'whyfbihere':
+                buffer = await whyFBIHere.getCanvasBuffer(message.buffers, body.text);
 
         }
     } catch (error) {
