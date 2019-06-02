@@ -14,7 +14,7 @@ module.exports = {
         try {
             //load image as node-canvas data
             let img = new Image();
-            img.src = images[0]
+            img.src = images[0];
 
             //get dimensions and specify it's 2d
             let canvas = createCanvas(img.width, img.height);

@@ -1,12 +1,14 @@
 const fs = require('fs');
-const { Worker } = require('worker_threads');
+const {fork} = require('child_process');
 
 module.exports = {
     endpoints: '/endpoints/',
     expressApp: undefined,
-    jimpScript: './src/workers/Jimp_worker.js',
+    jimpScript: './src/workers/ControllerScript.js',
     workerArray: undefined,
     counter: 0,
+    requestNum: 0,
+    responses: [],
 
     /**
      * inits the service.
@@ -34,8 +36,10 @@ module.exports = {
 
         // persist the workers into its own array
         for(let i = 0; i < this.maxThreads; i++) {
-            this.workerArray[i] = createWorker(this.jimpScript);
+            // console.log('creating');
+            this.workerArray[i] = createWorker(this.jimpScript, this.responses);
         }
+
 
         const serviceObj = {counter: this.counter, workerScript: this.jimpScript, maxThreads: this.maxThreads};
 
@@ -92,57 +96,37 @@ module.exports = {
         const valid = this.checkValidParams(res, body, module.args);
         if(!valid) return;
 
+        // push request onto array
+        this.responses.push({requestNum: this.requestNum, res: res});
 
-        // simple way of queueing the threads
+        // simple way of queueing the threads/processes
         this.counter++;
         if(this.counter >= this.maxThreads) this.counter = 0;
         const worker = this.workerArray[this.counter];
 
         // recovery method, create a new worker
-        if(worker == null) {
-            // create a new worker.
-            this.workerArray[this.counter] = createWorker(this.jimpScript);
-
-            console.log(this.workerArray);
-            // check if it's still null
-            if(worker == null) {
-                res.status(500);
-                res.contentType('application/json');
-                res.send('{"error": "image has errors."}');
-                return;
-            }
-        }
+        // if(worker == null) {
+        //     // create a new worker.
+        //     this.workerArray[this.counter] = createWorker(this.jimpScript);
+        //
+        //     // check if it's still null
+        //     if(worker == null) {
+        //         res.status(500);
+        //         res.contentType('application/json');
+        //         res.send('{"error": "Major Internal Error. Please notify the owners."}');
+        //         return;
+        //     }
+        // }
 
         // no listener, add our own
-        if(workerMessageListener) {
-            module.workerMessageListener(req, res, worker);
-        }
-        else {
-            // listen for message back, which is hopefully a buffer image.
-            worker.once('message', (buffer) => {
-
-                // make sure we have an uint8array
-                if (buffer instanceof Uint8Array) {
-                    res.status(200);
-                    res.contentType('image/jpg');
-                    res.send(Buffer.from(buffer));
-                }
-                // send string if we have that (for ascii images or url)
-                else if(typeof buffer === 'string' || buffer instanceof String) {
-                    res.status(200);
-                    res.contentType('application/json');
-                    res.send(`{"content": "${buffer}"}`);
-                }
-                else {
-                    res.status(500);
-                    res.contentType('application/json');
-                    res.send('{"error": "server error, image has errors."}');
-                }
-            });
-        }
+        // if(workerMessageListener) {
+        //     module.workerMessageListener(req, res, worker);
+        // }
 
         // send the message
-        worker.postMessage({endpoint: module.name, body: body, buffers: module.buffers});
+        worker.send({endpoint: module.name, body: body, buffers: module.buffers, requestNum: this.requestNum});
+
+        this.requestNum++;
     },
 
     /**
@@ -174,12 +158,50 @@ module.exports = {
 /**
  * create a new worker based off the script
  * @param script the script to create a worker thread off of.
+ * @param responses the list of resposnes we have to take care of.
  * @returns {Promise<void>}
  */
-const createWorker = (script) => {
-    const worker = new Worker(script);
-    worker.on('exit', (code) => console.error('thread exited', code));
-    worker.on('error', (error) => console.error(error));
+const createWorker = (script, responses) => {
+    const worker = fork(script, [], {stdio: 'inherit'});
+
+    // listen for message back, which is hopefully a buffer image.
+    worker.on('message', (message) => {
+        let buffer = message.buffer.data;
+        const requestNum = message.requestNum;
+
+        if(buffer != null && (typeof buffer !== 'string' && !(buffer instanceof String))) {
+            buffer = Buffer.from(buffer);
+        }
+
+        // get our response to send back to.
+        let response;
+        for(let i = 0; i < responses.length; i++) {
+            response = responses[i];
+            if(response.requestNum === requestNum) {
+                response = responses[i].res;
+                responses.splice(i, 1);
+                break;
+            }
+        }
+
+        // make sure we have an uint8array
+        if (buffer instanceof Uint8Array) {
+            response.status(200);
+            response.contentType('image/jpg');
+            response.send(buffer);
+        }
+        // send string if we have that (for ascii images or url)
+        else if(typeof buffer === 'string' || buffer instanceof String) {
+            response.status(200);
+            response.contentType('application/json');
+            response.send(`{"content": "${buffer}"}`);
+        }
+        else {
+            response.status(500);
+            response.contentType('application/json');
+            response.send('{"error": "server error, image has errors."}');
+        }
+    });
 
     return worker;
 };

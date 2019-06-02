@@ -17,12 +17,12 @@ app.listen(9002);
 
 // parse args
 const args = process.argv.slice(2);
-let threads = 10;
+let threads = 5;
 if(!isNaN(args[0])) {
     threads = parseInt(args[0]);
 }
 else {
-    console.error(`No threads detected or not a number. Defaulting to ${threads}.`);
+    console.error(`No processes detected or not a number. Defaulting to ${threads}.`);
 }
 
 // start the factory with our app
@@ -40,6 +40,6 @@ process.on('uncaughtException', (err) => {
     console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
     console.error(err.stack);
 
-    //exit the program because it's in an undefined state.
+    // exit the program because it's in an undefined state.
     process.exit(1);
 });

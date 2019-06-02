@@ -1,13 +1,13 @@
 # Manipulating Images Microservice (MIMS)
 A microservice API to process images using Node.js (although you shouldn't really use Node for processing images).
 This microservice uses about 300mb of ram when starting out and can be up to 600mb or more due to the number of requests you have.
-A default of 10 worker threads is created. You may need fewer or more depending on your use case. If that's the case then you must specify that when running
-docker by inputting a number. Example (in the dockerfile): `CMD ["node", "index.js", "20"]` will spawn 20 worker threads.
+A default of 5 processes is created. You may need fewer or more depending on your use case. If that's the case then you must specify that when running
+docker by inputting a number. Example (in the dockerfile): `CMD ["node", "index.js", "10"]` will spawn 10 child processes.
 
-If your node version is less than 11.5 you must use `node --experimental-worker index.js`
+If your node version is less than 11.5 you must use `node --experimental-worker index.js` (unless you use the dockerfile)
 
 #### This microservice mainly uses:
-`Jimp@latest` \
+`Jimp@latest` - oof this is bad \
 `node-canvas@latest` \
 `Sharp@latest`
 
@@ -73,7 +73,10 @@ My only request is to follow the current structure that is provided and make sur
 ___
 
 ## After thoughts: 
-Use Jimp until node-canvas gets worker threads support. Despite this microservice providing workers using Jimp, Canvas and Sharp are much faster (maybe 40% faster?).
-If you have the option in the future (when worker threads are hopefully supported by canvas), use canvas. Canvas (and Sharp) do not block the thread and use an external library to process images, making it much faster.
+Processes are more or less a hack due to node-canvas not support worker threads.
+I previously used worker threads, but I seriously do not like Jimp anymore due to its flaws.
+Canvas and Sharp are much faster (maybe 200% faster?).
+If you have the option in the future (when worker threads are hopefully supported by canvas), use canvas.
+Canvas (and Sharp) do not block the thread and use an external library to process images, making it much faster.
 
 
