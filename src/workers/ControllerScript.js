@@ -2,14 +2,10 @@
 const deepfry = require('./jimp/Deepfry_worker.js');
 const fry = require('./jimp/Fry_worker.js');
 const overfry = require('./jimp/Overfry_worker.js');
-const rdog = require('./jimp/Rdog_worker.js');
-const hatkidsays = require('./jimp/HatKidSays_worker.js');
 const halloweenify = require('./jimp/Halloweenify_worker.js');
 const blurpify = require('./jimp/Blurpify_worker.js');
-const sonicsays = require('./jimp/SonicSays_worker.js');
 const jpegify = require('./jimp/Jpegify_worker.js');
 const homie = require('./jimp/Homie_worker.js');
-const bazinga = require('./canvas/Bazinga_worker.js');
 const ascii = require('./jimp/Ascii_worker.js');
 const imgtobase64 = require('./jimp/IMGToBase64_worker.js');
 const giftobase64 = require('./jimp/GifToBase64_worker.js');
@@ -26,6 +22,11 @@ const pengu = require('../workers/canvas/Pengu_worker.js');
 const trumpLaw = require('../workers/canvas/TrumpLaw_worker.js');
 const tweetPerson = require('../workers/canvas/TweetPerson_worker.js');
 const whyFBIHere = require('../workers/canvas/WhyFBIHere_worker.js');
+const sonicsays = require('./canvas/SonicSays.js');
+const bazinga = require('./canvas/Bazinga_worker.js');
+const rdog = require('./canvas/Rdog.js');
+const hatkidsays = require('./canvas/HatKidSays.js');
+
 
 const canvasHelper = require('../workers/WorkerHelpers/CanvasHelper.js');
 
@@ -36,7 +37,7 @@ const blur = require('../workers/sharp/Blur.js');
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
 
-    let buffer;
+    let buffer = {};
     try {
         const endpoint = message.endpoint;
         const body = message.body;
@@ -88,7 +89,7 @@ process.on('message', async (message) => {
             break;
 
             case 'rdog':
-                buffer = await rdog.execute(body.text, message.buffers);
+                buffer = await rdog.execute(message.buffers, body.text);
             break;
 
             case 'trumphold':
@@ -155,7 +156,7 @@ process.on('message', async (message) => {
 
             case 'hatkidsays':
             case 'hatkidsayssmug':
-                buffer = await hatkidsays.execute(body.text, message.buffers);
+                buffer = await hatkidsays.execute(message.buffers, body.text);
             break;
 
             case 'halloweenify':
@@ -167,7 +168,7 @@ process.on('message', async (message) => {
             break;
 
             case 'sonicsays':
-                buffer = await sonicsays.execute(body.text, message.buffers);
+                buffer = await sonicsays.execute(message.buffers, body.text);
             break;
 
             case 'jpegify':
@@ -193,7 +194,7 @@ process.on('message', async (message) => {
             break;
 
             case 'ascii':
-                buffer = await ascii.execute(body.image_url);
+                buffer.data = await ascii.execute(body.image_url);
             break;
 
             case 'imgtobase64':
