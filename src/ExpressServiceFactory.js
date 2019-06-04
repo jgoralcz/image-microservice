@@ -167,6 +167,10 @@ const createWorker = (script, responses) => {
     // listen for message back, which is hopefully a buffer image.
     worker.on('message', (message) => {
         //TODO: if not message.buffer, send 500 cut out our response
+        if(message == null || !message.buffer || !message.buffer.data) {
+            console.log('woops');
+        }
+
         let buffer = message.buffer.data;
         const requestNum = message.requestNum;
 

@@ -9,7 +9,7 @@ module.exports = {
      * @param text the user's texts.
      * @returns {Promise<*>}
      */
-    getCanvasBuffer: async (images, text) => {
+    execute: async (images, text) => {
 
         try {
 

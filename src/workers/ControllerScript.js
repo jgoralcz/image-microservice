@@ -1,33 +1,8 @@
-// the main script to run most of your commands so the threads can delegate which one
-// canvas and sharp use their own threads which cause conflicts with worker threads.
-const bodypillow = require('./jimp/Bodypillow_worker.js');
-const bobross = require('./jimp/BobRoss_worker.js');
-const bobrosszoom = require('./jimp/BobRossZoom_worker.js');
-const bodypillowMale = require('./jimp/BodypillowMale_worker.js');
+// the main script to run most of your commands so the threads (actually processes for now)
 const deepfry = require('./jimp/Deepfry_worker.js');
 const fry = require('./jimp/Fry_worker.js');
 const overfry = require('./jimp/Overfry_worker.js');
-const jojoKira = require('./jimp/JojoKira_worker.js');
-const jojoShock = require('./jimp/JojoShock_worker.js');
-const jojoSmash = require('./jimp/JojoSmash_worker.js');
-const jojoSmile = require('./jimp/JojoSmile_worker.js');
-const phoneMeme = require('./jimp/PhoneMeme_worker.js');
 const rdog = require('./jimp/Rdog_worker.js');
-const trumphold = require('./jimp/TrumpHold_worker.js');
-const noteImage = require('./jimp/NoteImage_worker.js');
-const top10anime = require('./jimp/Top10AnimeBattles_worker.js');
-const policeposter = require('./jimp/PolicePoster_worker.js');
-const payrespects = require('./jimp/PayRespects_worker.js');
-const mariojumping = require('./jimp/MarioJumping_worker.js');
-const sunnyframe = require('./jimp/SunnyFrame_worker.js');
-const loveher = require('./jimp/LoveHer_worker.js');
-const dio = require('./jimp/Dio_worker.js');
-const dateline = require('./jimp/Dateline_worker.js');
-const nope = require('./jimp/Nope_worker.js');
-const hot = require('./jimp/Hot_worker.js');
-const jojowallet = require('./jimp/JojoWallet_worker.js');
-const ihadto = require('./jimp/IHadTo_worker.js');
-const vsauce = require('./jimp/VSauce_worker.js');
 const hatkidsays = require('./jimp/HatKidSays_worker.js');
 const halloweenify = require('./jimp/Halloweenify_worker.js');
 const blurpify = require('./jimp/Blurpify_worker.js');
@@ -35,17 +10,13 @@ const sonicsays = require('./jimp/SonicSays_worker.js');
 const jpegify = require('./jimp/Jpegify_worker.js');
 const homie = require('./jimp/Homie_worker.js');
 const bazinga = require('./jimp/Bazinga_worker.js');
-const blur = require('./jimp/Blur_worker.js');
 const ascii = require('./jimp/Ascii_worker.js');
 const imgtobase64 = require('./jimp/IMGToBase64_worker.js');
 const giftobase64 = require('./jimp/GifToBase64_worker.js');
 const qrcodetext = require('./jimp/qrCode_worker.js');
 const pixelate = require('./jimp/Pixelate_worker.js');
-const loadBuffer = require('./jimp/LoadBuffer_worker.js');
+const loadBuffer = require('./canvas/LoadBuffer_worker.js');
 const saveImage = require('./jimp/SaveImage_worker.js');
-const wtfPoe = require('./jimp/WtfPoe_worker.js');
-const bongocattop = require('./jimp/BongoCatTop_worker.js');
-const pregnant = require('./jimp/Pregnant_worker.js');
 
 // canvas
 const cmm = require('../workers/canvas/ChangeMyMind_worker.js');
@@ -56,6 +27,12 @@ const trumpLaw = require('../workers/canvas/TrumpLaw_worker.js');
 const tweetPerson = require('../workers/canvas/TweetPerson_worker.js');
 const whyFBIHere = require('../workers/canvas/WhyFBIHere_worker.js');
 
+const canvasHelper = require('../workers/WorkerHelpers/CanvasHelper.js');
+
+// sharp
+const sharpen = require('../workers/sharp/Sharpen.js');
+const blur = require('../workers/sharp/Blur.js');
+
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
 
@@ -63,14 +40,15 @@ process.on('message', async (message) => {
     try {
         const endpoint = message.endpoint;
         const body = message.body;
+
         switch(endpoint) {
 
             case 'bodypillow':
-                buffer = await bodypillow.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 105, resizeY: 115, compositeX1: 220, compositeY1: 130 });
             break;
 
             case 'bodypillowmale':
-                buffer = await bodypillowMale.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 75, resizeY: 75, compositeX1: 95, compositeY1: 79 });
             break;
 
             case 'deepfry':
@@ -86,23 +64,27 @@ process.on('message', async (message) => {
             break;
 
             case 'jojokira':
-                buffer = await jojoKira.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 315, resizeY: 430, compositeX1: 800, compositeY1: 10, rotate: .30 });
             break;
 
             case 'jojoshock':
-                buffer = await jojoShock.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 88, resizeY: 82, compositeX1: 302, compositeY1: 150 });
             break;
 
             case 'jojosmash':
-                buffer = await jojoSmash.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 355, resizeY: 255, compositeX1: 0, compositeY1: 230 });
             break;
 
             case 'jojosmile':
-                buffer = await jojoSmile.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 220, resizeY: 210, compositeX1: 173, compositeY1: 20, rotate: -0.3 });
+            break;
+
+            case 'jojowallet':
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 445, resizeY: 270, compositeX1: 285, compositeY1: 125, rotate: -0.6 });
             break;
 
             case 'phonememe':
-                buffer = await phoneMeme.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 350, resizeY: 600, compositeX1: 650, compositeY1: 580, rotate: 0.2  } );
             break;
 
             case 'rdog':
@@ -110,67 +92,65 @@ process.on('message', async (message) => {
             break;
 
             case 'trumphold':
-                buffer = await trumphold.execute(body.image_url, message.buffers);
-            break;
-
-            case 'noteimage':
-                buffer = await noteImage.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 250, resizeY: 370, compositeX1: 340, compositeY1: 190, rotate: 0.2  } );
             break;
 
             case 'top10animebattles':
             case 'top10animesad':
             case 'top10animebrutal':
             case 'top10animebetrayal':
-                buffer = await top10anime.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 625, resizeY: 391, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'policeposter':
-                buffer = await policeposter.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 195, resizeY: 255, compositeX1: 190, compositeY1: 345, rotate: -0.17 });
             break;
 
             case 'payrespects':
-                buffer = await payrespects.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 98, resizeY: 125, compositeX1: 70, compositeY1: -12, rotate: -.09 });
             break;
 
             case 'mariojumping':
-                buffer = await mariojumping.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 270, resizeY: 200, compositeX1: 375, compositeY1: 0 });
             break;
 
             case 'sunnyframe':
             case 'sunnyframequote':
-                buffer = await sunnyframe.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 275, resizeY: 475, compositeX1: 155, compositeY1: 25, rotate: -0.03 });
             break;
 
             case 'loveher':
-                buffer = await loveher.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 640, resizeY: 610, compositeX1: 0, compositeY1: 562 });
             break;
 
             case 'dio':
-                buffer = await dio.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, message.buffers, { resizeX: 934, resizeY: 720, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'dateline':
-                buffer = await dateline.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 480, resizeY: 480, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'nope':
-                buffer = await nope.execute(body.image_url, message.buffers);
-            break;
-
-            case 'jojowallet':
-                buffer = await jojowallet.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 350, resizeY: 460, compositeX1: 310, compositeY1: 12 });
             break;
 
             case 'hot':
-                buffer = await hot.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, message.buffers,
+                    {
+                        resizeX: undefined, // undefined means use the image default
+                        resizeY: 320,
+                        compositeX1: 0,
+                        compositeY1: 355
+                    });
             break;
 
             case 'ihadto':
-                buffer = await ihadto.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, message.buffers,  { resizeX: 480, resizeY: 480, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'vsauce':
-                buffer = await vsauce.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 753, resizeY: 528, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'hatkidsays':
@@ -203,7 +183,13 @@ process.on('message', async (message) => {
             break;
 
             case 'blur':
-                buffer = await blur.execute(body.image_url, parseInt(body.number || 1));
+                buffer = await loadBuffer.execute(body.image_url);
+                buffer = await blur.execute(buffer, parseInt(body.number) || 10);
+            break;
+
+            case 'sharpen':
+                buffer = await loadBuffer.execute(body.image_url);
+                buffer = await sharpen.execute(buffer, parseInt(body.number) || 10);
             break;
 
             case 'ascii':
@@ -218,7 +204,7 @@ process.on('message', async (message) => {
                 buffer = await giftobase64.execute(body.image_url);
             break;
 
-            case 'qrcodetext':
+            case 'qrcode':
                 buffer = await qrcodetext.execute(body.image_url);
             break;
 
@@ -226,64 +212,65 @@ process.on('message', async (message) => {
                 buffer = await pixelate.execute(body.image_url);
             break;
 
-            case 'sharpen':
-                buffer = await loadBuffer.execute(body.image_url);
-            break;
-
             case 'saveimage':
                 buffer = await saveImage.execute(body.image_url, body.file_name);
             break;
 
             case 'wtfpoe':
-                buffer = await wtfPoe.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 480, resizeY: 340, compositeX1: 0, compositeY1: 0 } );
             break;
 
             case 'bongocattop':
             case 'bongocatmiddle':
-                buffer = await bongocattop.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 680, resizeY: 689, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'pregnant':
-                buffer = await pregnant.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 636, resizeY: 474, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'bobross':
-                buffer = await bobross.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 455, resizeY: 400, compositeX1: 5, compositeY1: 36, rotate: 0.05 });
             break;
 
             case 'bobrosszoom':
-                buffer = await bobrosszoom.execute(body.image_url, message.buffers);
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 247, resizeY: 228, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'changemymind':
-                buffer = await cmm.getCanvasBuffer(message.buffers, body.text);
+                buffer = await cmm.execute(message.buffers, body.text);
             break;
 
             case 'achievement':
-                buffer = await achievement.getCanvasBuffer(message.buffers, body.text);
+                buffer = await achievement.execute(message.buffers, body.text);
+            break;
+
+            case 'noteimage':
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 200, resizeY: 170, compositeX1: 425, compositeY1: 390, rotate: 0.4 });
             break;
 
             case 'notetext':
-                buffer = await noteText.getCanvasBuffer(message.buffers, body.text);
+                buffer = await noteText.execute(message.buffers, body.text);
             break;
 
             case 'pengu':
-                buffer = await pengu.getCanvasBuffer(message.buffers, body.text);
+                buffer = await pengu.execute(message.buffers, body.text);
             break;
 
             case 'trumplaw':
-                buffer = await trumpLaw.getCanvasBuffer(message.buffers, body.text);
+                buffer = await trumpLaw.execute(message.buffers, body.text);
             break;
 
             case 'elontweet':
             case 'trumptweet':
-                buffer = await tweetPerson.getCanvasBuffer(message.buffers, body.text);
+                buffer = await tweetPerson.execute(message.buffers, body.text);
             break;
 
             case 'whyfbihere':
-                buffer = await whyFBIHere.getCanvasBuffer(message.buffers, body.text);
+                buffer = await whyFBIHere.execute(message.buffers, body.text);
 
         }
+
     } catch (error) {
         console.error(error);
     }
