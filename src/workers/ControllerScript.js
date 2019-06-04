@@ -9,7 +9,7 @@ const blurpify = require('./jimp/Blurpify_worker.js');
 const sonicsays = require('./jimp/SonicSays_worker.js');
 const jpegify = require('./jimp/Jpegify_worker.js');
 const homie = require('./jimp/Homie_worker.js');
-const bazinga = require('./jimp/Bazinga_worker.js');
+const bazinga = require('./canvas/Bazinga_worker.js');
 const ascii = require('./jimp/Ascii_worker.js');
 const imgtobase64 = require('./jimp/IMGToBase64_worker.js');
 const giftobase64 = require('./jimp/GifToBase64_worker.js');
@@ -179,7 +179,7 @@ process.on('message', async (message) => {
             break;
 
             case 'bazinga':
-                buffer = await bazinga.execute(body.image_url, message.buffers);
+                buffer = await bazinga.execute(message.buffers, body.image_url);
             break;
 
             case 'blur':

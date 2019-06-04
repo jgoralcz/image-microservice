@@ -23,13 +23,13 @@ module.exports = {
             // ctx.quality = 'fast';
             // ctx.patternQuality = 'fast';
 
-            // rotate
-            const x = canvas.width/2;
-            const y = canvas.height/2;
-
             // ctx.translate(imageSpecs.compositeX1, imageSpecs.compositeY1);
             // // rotate if needed
             if(imageSpecs.rotate) {
+                // rotate
+                const x = canvas.width/2;
+                const y = canvas.height/2;
+
                 ctx.translate(x, y);
                 ctx.rotate(imageSpecs.rotate);
 
