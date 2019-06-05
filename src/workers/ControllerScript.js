@@ -1,38 +1,39 @@
 // the main script to run most of your commands so the threads (actually processes for now)
 const deepfry = require('./jimp/Deepfry_worker.js');
-const fry = require('./jimp/Fry_worker.js');
+
 const overfry = require('./jimp/Overfry_worker.js');
 const halloweenify = require('./jimp/Halloweenify_worker.js');
 const blurpify = require('./jimp/Blurpify_worker.js');
 const jpegify = require('./jimp/Jpegify_worker.js');
-const homie = require('./jimp/Homie_worker.js');
 const ascii = require('./jimp/Ascii_worker.js');
 const imgtobase64 = require('./jimp/IMGToBase64_worker.js');
 const giftobase64 = require('./jimp/GifToBase64_worker.js');
 const qrcodetext = require('./jimp/qrCode_worker.js');
 const pixelate = require('./jimp/Pixelate_worker.js');
-const loadBuffer = require('./canvas/LoadBuffer_worker.js');
 const saveImage = require('./jimp/SaveImage_worker.js');
 
 // canvas
-const cmm = require('../workers/canvas/ChangeMyMind_worker.js');
-const achievement = require('../workers/canvas/Achievement_worker.js');
-const noteText = require('../workers/canvas/NoteText_worker.js');
-const pengu = require('../workers/canvas/Pengu_worker.js');
-const trumpLaw = require('../workers/canvas/TrumpLaw_worker.js');
-const tweetPerson = require('../workers/canvas/TweetPerson_worker.js');
-const whyFBIHere = require('../workers/canvas/WhyFBIHere_worker.js');
+const cmm = require('./canvas/ChangeMyMind_worker.js');
+const achievement = require('./canvas/Achievement_worker.js');
+const noteText = require('./canvas/NoteText_worker.js');
+const pengu = require('./canvas/Pengu_worker.js');
+const trumpLaw = require('./canvas/TrumpLaw_worker.js');
+const tweetPerson = require('./canvas/TweetPerson_worker.js');
+const whyFBIHere = require('./canvas/WhyFBIHere_worker.js');
 const sonicsays = require('./canvas/SonicSays.js');
 const bazinga = require('./canvas/Bazinga_worker.js');
 const rdog = require('./canvas/Rdog.js');
 const hatkidsays = require('./canvas/HatKidSays.js');
+const homie = require('./canvas/Homie.js');
 
-
-const canvasHelper = require('../workers/WorkerHelpers/CanvasHelper.js');
+const canvasHelper = require('./WorkerHelpers/CanvasHelper.js');
+const loadBuffer = require('./canvas/LoadBuffer_worker.js');
 
 // sharp
-const sharpen = require('../workers/sharp/Sharpen.js');
-const blur = require('../workers/sharp/Blur.js');
+const sharpen = require('./sharp/Sharpen.js');
+const blur = require('./sharp/Blur.js');
+
+const fry = require('./WorkerHelpers/Fried.js');
 
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
@@ -57,7 +58,8 @@ process.on('message', async (message) => {
             break;
 
             case 'fry':
-                buffer = await fry.execute(body.image_url);
+                buffer = await fry.friedProcess(body.image_url, 0.43, 150);
+                buffer = await sharpen.execute(buffer, 100);
             break;
 
             case 'overfry':
@@ -176,7 +178,7 @@ process.on('message', async (message) => {
             break;
 
             case 'homie':
-                buffer = await homie.execute(body.image_url, message.buffers);
+                buffer = await homie.execute(message.buffers, body.image_url);
             break;
 
             case 'bazinga':

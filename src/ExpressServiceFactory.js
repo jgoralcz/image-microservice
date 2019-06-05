@@ -118,11 +118,6 @@ module.exports = {
         //     }
         // }
 
-        // no listener, add our own
-        // if(workerMessageListener) {
-        //     module.workerMessageListener(req, res, worker);
-        // }
-
         // send the message
         worker.send({endpoint: module.name, body: body, buffers: module.buffers, requestNum: this.requestNum});
 
@@ -162,7 +157,7 @@ module.exports = {
  * @returns {Promise<void>}
  */
 const createWorker = (script, responses) => {
-    const worker = fork(script, []);
+    const worker = fork(script, [], {stdio: 'inherit'});
 
     // listen for message back, which is hopefully a buffer image.
     worker.on('message', (message) => {

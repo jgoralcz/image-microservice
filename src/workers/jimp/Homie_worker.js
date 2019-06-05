@@ -12,7 +12,6 @@ module.exports = {
 
         try {
 
-            console.log(buffer);
             // create images
             const underImage = await Jimp.read(Buffer.from(buffer[0]));
             let newImage = await Jimp.read(image_url);

@@ -17,7 +17,7 @@ app.listen(9002);
 
 // parse args
 const args = process.argv.slice(2);
-let threads = 5;
+let threads = 3;
 if(!isNaN(args[0])) {
     threads = parseInt(args[0]);
 }

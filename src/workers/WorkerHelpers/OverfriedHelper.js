@@ -33,7 +33,7 @@ module.exports = {
 
             if(saturation) {
                 image.color([
-                    {apply: 'saturate', params: [150]}
+                    {apply: 'saturate', params: [saturation]}
                 ]);
             }
             image.scale(1.25);
