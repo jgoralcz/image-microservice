@@ -34,17 +34,17 @@ module.exports = {
 
             // saturation
             ctx.globalCompositeOperation = 'saturation';
-            ctx.fillStyle = `hsl(15%, 100%, 50%)`;
+            ctx.fillStyle = `hsl(0, 100%, 50%)`;
             ctx.fillRect(0, 0, theirImage.width, theirImage.height);
             ctx.globalCompositeOperation = 'source-over';  // restore default comp
 
             let imageData = ctx.getImageData(0, 0, theirImage.width, theirImage.height);
-            imageData = await fried.brightnessContrastPhotoshop(imageData, 12, 40);
+            imageData = await fried.brightnessContrastPhotoshop(imageData, 22, 40);
 
             ctx.putImageData(imageData, 0, 0);
-            imageData = await fried.brightnessContrastPhotoshop(imageData, 12, 40);
+            imageData = await fried.brightnessContrastPhotoshop(imageData, 32, 40);
             imageData = await fried.grain(imageData);
-            imageData = await fried.brightnessContrastPhotoshop(imageData, 12, 20);
+            imageData = await fried.brightnessContrastPhotoshop(imageData, 62, 20);
             ctx.putImageData(imageData, 0, 0);
 
             return canvas.toBuffer('image/jpeg', { quality: 0.15 });

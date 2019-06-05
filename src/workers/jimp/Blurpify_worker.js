@@ -13,13 +13,12 @@ module.exports = {
             const image = await Jimp.read(image_url);
 
             while (image.bitmap.width > 800 || image.bitmap.height > 800) {
-                image.scale(0.5);
+                image.scale(0.6);
             }
 
             image.grayscale();
-
-            //114, 137, 218
             image.brightness(-0.2);
+
             image.color([
                 {apply: 'red', params: [114]},
                 {apply: 'green', params: [137]},

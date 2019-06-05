@@ -138,7 +138,7 @@ module.exports = {
             let arg = args[i];
 
             // no body with this argument, bad input
-            if(!body[arg]) {
+            if(body[arg] == null || body[arg] === '') {
                 res.status(400);
                 res.contentType('application/json');
                 res.send(`{"error": "Incorrect Parameters met. Needs: ${args}"}`);

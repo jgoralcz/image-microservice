@@ -17,7 +17,7 @@ module.exports = {
      * @param color the color to apply
      * @returns {Promise<*>}
      */
-    execute: async function (imageURL, opacity, color='#e84e10') {
+    execute: async function (imageURL, opacity, color='#ff591a') {
 
         try {
             const theirImage = await loadImage(imageURL);
@@ -34,14 +34,15 @@ module.exports = {
 
             // saturation
             ctx.globalCompositeOperation = 'saturation';
-            ctx.fillStyle = `hsl(5%, 100%, 50%)`;
+            ctx.fillStyle = `hsl(0, 100%, 50%)`;
             ctx.fillRect(0, 0, theirImage.width, theirImage.height);
             ctx.globalCompositeOperation = 'source-over';  // restore default comp
 
             let imageData = ctx.getImageData(0, 0, theirImage.width, theirImage.height);
-            imageData = await fried.brightnessContrastPhotoshop(imageData, 32, 40);
+            imageData = await fried.brightnessContrastPhotoshop(imageData, 52, 60);
 
             ctx.putImageData(imageData, 0, 0);
+            imageData = await fried.brightnessContrastPhotoshop(imageData, 32, 40);
             imageData = await fried.grain(imageData);
             ctx.putImageData(imageData, 0, 0);
 
