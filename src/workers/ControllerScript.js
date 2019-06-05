@@ -1,6 +1,4 @@
 // the main script to run most of your commands so the threads (actually processes for now)
-const deepfry = require('./jimp/Deepfry_worker.js');
-
 const overfry = require('./jimp/Overfry_worker.js');
 const halloweenify = require('./jimp/Halloweenify_worker.js');
 const blurpify = require('./jimp/Blurpify_worker.js');
@@ -24,6 +22,9 @@ const sonicsays = require('./canvas/SonicSays.js');
 const bazinga = require('./canvas/Bazinga_worker.js');
 const rdog = require('./canvas/Rdog.js');
 const hatkidsays = require('./canvas/HatKidSays.js');
+const fry = require('./WorkerHelpers/Fried.js');
+const deepfry = require('./WorkerHelpers/DeepFry.js');
+
 const homie = require('./canvas/Homie.js');
 
 const canvasHelper = require('./WorkerHelpers/CanvasHelper.js');
@@ -32,8 +33,6 @@ const loadBuffer = require('./canvas/LoadBuffer_worker.js');
 // sharp
 const sharpen = require('./sharp/Sharpen.js');
 const blur = require('./sharp/Blur.js');
-
-const fry = require('./WorkerHelpers/Fried.js');
 
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
@@ -54,11 +53,12 @@ process.on('message', async (message) => {
             break;
 
             case 'deepfry':
-                buffer = await deepfry.execute(body.image_url);
+                buffer = await deepfry.execute(body.image_url, 0.23);
+                buffer = await sharpen.execute(buffer, 100);
             break;
 
             case 'fry':
-                buffer = await fry.friedProcess(body.image_url, 0.43, 150);
+                buffer = await fry.friedProcess(body.image_url, 0.12);
                 buffer = await sharpen.execute(buffer, 100);
             break;
 
