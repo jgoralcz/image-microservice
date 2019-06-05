@@ -1,5 +1,4 @@
 // the main script to run most of your commands so the threads (actually processes for now)
-const overfry = require('./jimp/Overfry_worker.js');
 const halloweenify = require('./jimp/Halloweenify_worker.js');
 const blurpify = require('./jimp/Blurpify_worker.js');
 const jpegify = require('./jimp/Jpegify_worker.js');
@@ -24,6 +23,7 @@ const rdog = require('./canvas/Rdog.js');
 const hatkidsays = require('./canvas/HatKidSays.js');
 const fry = require('./WorkerHelpers/Fried.js');
 const deepfry = require('./WorkerHelpers/DeepFry.js');
+const overfry = require('./WorkerHelpers/OverFry.js');
 
 const homie = require('./canvas/Homie.js');
 
@@ -53,17 +53,18 @@ process.on('message', async (message) => {
             break;
 
             case 'deepfry':
-                buffer = await deepfry.execute(body.image_url, 0.23);
+                buffer = await deepfry.execute(body.image_url, 0.26);
                 buffer = await sharpen.execute(buffer, 100);
             break;
 
             case 'fry':
-                buffer = await fry.friedProcess(body.image_url, 0.12);
+                buffer = await fry.execute(body.image_url, 0.12);
                 buffer = await sharpen.execute(buffer, 100);
             break;
 
             case 'overfry':
-                buffer = await overfry.execute(body.image_url);
+                buffer = await overfry.execute(body.image_url, 0.23);
+                buffer = await sharpen.execute(buffer, 100);
             break;
 
             case 'jojokira':

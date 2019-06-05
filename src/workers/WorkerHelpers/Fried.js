@@ -16,7 +16,7 @@ module.exports = {
      * @param color the color to apply
      * @returns {Promise<*>}
      */
-    friedProcess: async function (imageURL, opacity, color='#ff6600') {
+    execute: async function (imageURL, opacity, color='#ff6600') {
 
         try {
             const theirImage = await loadImage(imageURL);
