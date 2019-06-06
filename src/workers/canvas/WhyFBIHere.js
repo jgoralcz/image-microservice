@@ -28,7 +28,7 @@ module.exports = {
 
             //load image as node-canvas data
             let img2 = new Image();
-            img2.src = images[1];
+            img2.src = Buffer.from(images[1]);
             ctx.drawImage(img2, 627, 0, img2.width, img2.height);
 
             return canvas.toBuffer('image/jpeg', undefined);

@@ -23,9 +23,9 @@ module.exports = {
             //draw image
             ctx.drawImage(img, 0, 0, img.width, img.height);
 
-            ctx.translate(350, 25);
+            ctx.translate(350, 50);
 
-            let fontSize = 28;
+            let fontSize = 32;
 
             ctx.font = `${fontSize}px 'Arial'`;
             const lines = line.getLines(ctx, text, 275);
