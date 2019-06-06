@@ -1,18 +1,9 @@
 const express = require('express');
+const app = express();
 const startFactory = require('./src/ExpressServiceFactory.js');
 
-const app = express();
+// start our express
 app.use(express.json()); // we need to get the body in json format
-
-// use / to give message
-// app.use(`/`, async (req, res, next) => {
-//
-//     res.contentType('application/json');
-//     res.status(400);
-//     res.send('Please use the correct endpoints. See the github repo for the endpoints.');
-//
-// });
-
 app.listen(9002);
 
 // parse args
@@ -28,7 +19,13 @@ else {
 // start the factory with our app
 startFactory.init(app, threads);
 
+// use / to give message
+app.use(`/`, async (req, res) => {
 
+    res.contentType('application/json');
+    res.status(400);
+    res.send('Please use the correct endpoints. See the github repo for the endpoints and check in the /src/endpoints folder.');
+});
 
 //shows where the rejection occured
 process.on('unhandledRejection', (reason, p) => {
