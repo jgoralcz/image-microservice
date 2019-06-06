@@ -1,34 +1,34 @@
 // the main script to run most of your commands so the threads (actually processes for now)
-const halloweenify = require('./jimp/Halloweenify_worker.js');
-const blurpify = require('./jimp/Blurpify_worker.js');
-const jpegify = require('./jimp/Jpegify_worker.js');
-const ascii = require('./jimp/Ascii_worker.js');
-const imgtobase64 = require('./jimp/IMGToBase64_worker.js');
-const giftobase64 = require('./jimp/GifToBase64_worker.js');
-const qrcodetext = require('./jimp/qrCode_worker.js');
-const pixelate = require('./jimp/Pixelate_worker.js');
-const saveImage = require('./jimp/SaveImage_worker.js');
+const halloweenify = require('./jimp/Halloweenify.js');
+const blurpify = require('./jimp/Blurpify.js');
+const jpegify = require('./jimp/Jpegify.js');
+const ascii = require('./jimp/Ascii.js');
+const imgtobase64 = require('./jimp/IMGToBase64.js');
+const giftobase64 = require('./jimp/GifToBase64.js');
+const qrcodetext = require('./jimp/qrCode.js');
+const pixelate = require('./jimp/Pixelate.js');
+const saveImage = require('./jimp/SaveImage.js');
 
 // canvas
-const cmm = require('./canvas/ChangeMyMind_worker.js');
-const achievement = require('./canvas/Achievement_worker.js');
-const noteText = require('./canvas/NoteText_worker.js');
-const pengu = require('./canvas/Pengu_worker.js');
-const trumpLaw = require('./canvas/TrumpLaw_worker.js');
-const tweetPerson = require('./canvas/TweetPerson_worker.js');
-const whyFBIHere = require('./canvas/WhyFBIHere_worker.js');
+const cmm = require('./canvas/ChangeMyMind.js');
+const achievement = require('./canvas/Achievement.js');
+const noteText = require('./canvas/NoteText.js');
+const pengu = require('./canvas/Pengu.js');
+const trumpLaw = require('./canvas/TrumpLaw.js');
+const tweetPerson = require('./canvas/TweetPerson.js');
+const whyFBIHere = require('./canvas/WhyFBIHere.js');
 const sonicsays = require('./canvas/SonicSays.js');
-const bazinga = require('./canvas/Bazinga_worker.js');
+const bazinga = require('./canvas/Bazinga.js');
 const rdog = require('./canvas/Rdog.js');
 const hatkidsays = require('./canvas/HatKidSays.js');
-const fry = require('./WorkerHelpers/Fried.js');
-const deepfry = require('./WorkerHelpers/DeepFry.js');
-const overfry = require('./WorkerHelpers/OverFry.js');
+const fry = require('./canvas/Fried.js');
+const deepfry = require('./canvas/DeepFry.js');
+const overfry = require('./canvas/OverFry.js');
 
-const homie = require('./canvas/Homie.js');
+const homie = require('./jimp/Homie.js');
 
 const canvasHelper = require('./WorkerHelpers/CanvasHelper.js');
-const loadBuffer = require('./canvas/LoadBuffer_worker.js');
+const loadBuffer = require('./canvas/LoadBuffer.js');
 
 // sharp
 const sharpen = require('./sharp/Sharpen.js');
@@ -163,7 +163,7 @@ process.on('message', async (message) => {
             break;
 
             case 'halloweenify':
-                buffer = await halloweenify.execute(body.image_url, parseInt(body.threshold || 1));
+                buffer = await halloweenify.execute(body.image_url, parseInt(body.threshold || 0));
             break;
 
             case 'blurpify':

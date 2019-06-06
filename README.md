@@ -1,8 +1,11 @@
 # Manipulating Images Microservice (MIMS)
 A microservice API to process images using Node.js (although you shouldn't really use Node for processing images).
-This microservice uses about 300mb of ram when starting out and can be up to 600mb or more due to the number of requests you have.
-A default of 3 processes is created. You may need fewer or more depending on your use case. If that's the case then you must specify that when running
-docker by inputting a number. Example (in the dockerfile): `CMD ["node", "index.js", "10"]` will spawn 10 child processes (hopefully worker threads in the future).
+This microservice uses about 500mb of ram when starting out and can be up to 900mb or more due to the number of requests you have.
+A default of 3 processes is created. Processes are indeed heavy. Only create more if you really need the concurency. 
+As a result, we are patiently waiting for both sharp and node-canvas to support worker-threads. 
+You may need fewer or more depending on your use case. If that's the case then you must specify that when running
+docker by inputting a number. Example (in the dockerfile): `CMD ["node", "index.js", "10"]` will spawn 10 child processes
+ (hopefully worker threads in the future).
 
 If your node version is less than 11.5 you must use `node --experimental-worker index.js` (unless you use the dockerfile)
 

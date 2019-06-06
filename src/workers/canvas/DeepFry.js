@@ -17,7 +17,7 @@ module.exports = {
      * @param color the color to apply
      * @returns {Promise<*>}
      */
-    execute: async function (imageURL, opacity, color='#e03513') {
+    execute: async function (imageURL, opacity, color='#ff591a') {
 
         try {
             const theirImage = await loadImage(imageURL);
@@ -39,15 +39,14 @@ module.exports = {
             ctx.globalCompositeOperation = 'source-over';  // restore default comp
 
             let imageData = ctx.getImageData(0, 0, theirImage.width, theirImage.height);
-            imageData = await fried.brightnessContrastPhotoshop(imageData, 22, 40);
+            imageData = await fried.brightnessContrastPhotoshop(imageData, 52, 60);
 
             ctx.putImageData(imageData, 0, 0);
             imageData = await fried.brightnessContrastPhotoshop(imageData, 32, 40);
             imageData = await fried.grain(imageData);
-            imageData = await fried.brightnessContrastPhotoshop(imageData, 62, 20);
             ctx.putImageData(imageData, 0, 0);
 
-            return canvas.toBuffer('image/jpeg', { quality: 0.15 });
+            return canvas.toBuffer('image/jpeg', { quality: 0.5 });
 
 
         } catch (error) {

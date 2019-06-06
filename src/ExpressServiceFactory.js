@@ -9,6 +9,7 @@ module.exports = {
     counter: 0,
     requestNum: 0,
     responses: [],
+    interval: undefined,
 
     /**
      * inits the service.
@@ -20,6 +21,32 @@ module.exports = {
         this.expressApp = app;
         this.maxThreads = numThreads;
         this.createServicesAndWorkers();
+
+        // set interval
+        this.interval = setInterval( () => {
+
+            // clear all responses that are too old (perhaps some error?
+            if(this.responses && this.responses.length > 0) {
+                // loop over all that are too old (2 minutes because it should only take a max of 2 seconds to process an image.)
+                for(let i = 0; i < this.responses.length; i++) {
+                    let response = this.responses[i];
+
+                    // check by the timestamp
+                    if(response.timestamp) {
+
+                        const time = response.timestamp.getTime();
+                        const twoMinutes = 1000 * 60 * 2;
+
+                        // get time makes sure it's greater than 2 minutes
+                        if(new Date().getTime() - time > twoMinutes) {
+                            response = this.responses[i].res;
+                            this.responses.splice(i, 1);
+                        }
+                    }
+                }
+            }
+
+        }, 10000); // 10 minutes
     },
 
     /**
@@ -97,31 +124,33 @@ module.exports = {
         if(!valid) return;
 
         // push request onto array
-        this.responses.push({requestNum: this.requestNum, res: res});
+        this.responses.push({requestNum: this.requestNum, res: res, timestamp: new Date()}); // timestamp in case something happens, we want to remove them that are older than 5 minutes.
 
         // simple way of queueing the threads/processes
         this.counter++;
         if(this.counter >= this.maxThreads) this.counter = 0;
         const worker = this.workerArray[this.counter];
 
-        // recovery method, create a new worker
-        // if(worker == null) {
-        //     // create a new worker.
-        //     this.workerArray[this.counter] = createWorker(this.jimpScript);
-        //
-        //     // check if it's still null
-        //     if(worker == null) {
-        //         res.status(500);
-        //         res.contentType('application/json');
-        //         res.send('{"error": "Major Internal Error. Please notify the owners."}');
-        //         return;
-        //     }
-        // }
+        // recovery method, create a new worker/process
+        if(worker == null) {
+            // create a new worker.
+            this.workerArray[this.counter] = createWorker(this.jimpScript, this.responses);
+
+            // check if it's still null
+            if(worker == null) {
+                res.status(500);
+                res.contentType('application/json');
+                res.send('{"error": "Major Internal Error. Please notify the owners."}');
+                return;
+            }
+        }
 
         // send the message
         worker.send({endpoint: module.name, body: body, buffers: module.buffers, requestNum: this.requestNum});
 
+        // increment then reset if necssary
         this.requestNum++;
+        if(this.requestNum > 10000) this.requestNum = 0;
     },
 
     /**
@@ -160,10 +189,16 @@ const createWorker = (script, responses) => {
     const worker = fork(script, [], {stdio: 'inherit'});
 
     // listen for message back, which is hopefully a buffer image.
-    worker.on('message', (message) => {
-        //TODO: if not message.buffer, send 500 cut out our response
+    worker.on('message', async (message) => {
         if(message == null || !message.buffer || !message.buffer.data) {
-            console.log('woops');
+
+            if(message && message.requestNum != null) {
+                const response = await filterResponses(responses, message.requestNum);
+                response.status(500);
+                response.contentType('application/json');
+                response.send('{"error": "server error, image has errors."}');
+            }
+            return;
         }
 
         let buffer = message.buffer.data;
@@ -174,14 +209,10 @@ const createWorker = (script, responses) => {
         }
 
         // get our response to send back to.
-        let response;
-        for(let i = 0; i < responses.length; i++) {
-            response = responses[i];
-            if(response.requestNum === requestNum) {
-                response = responses[i].res;
-                responses.splice(i, 1);
-                break;
-            }
+        const response = await filterResponses(responses, requestNum);
+
+        if(!response) {
+            return console.error('could not find response for this requested number.');
         }
 
         // make sure we have an uint8array
@@ -204,4 +235,22 @@ const createWorker = (script, responses) => {
     });
 
     return worker;
+};
+
+/**
+ *
+ * @param responses
+ * @param requestNum
+ * @returns {Promise<boolean>}
+ */
+const filterResponses = async (responses, requestNum) => {
+
+    for(let i = 0; i < responses.length; i++) {
+        let response = responses[i];
+        if(response.requestNum === requestNum) {
+            response = responses[i].res;
+            responses.splice(i, 1);
+            return response;
+        }
+    }
 };

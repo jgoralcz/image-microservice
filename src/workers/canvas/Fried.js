@@ -46,7 +46,7 @@ module.exports = {
             imageData = await this.grain(imageData);
             ctx.putImageData(imageData, 0, 0);
 
-            return canvas.toBuffer('image/jpeg', { quality: 0.20 });
+            return canvas.toBuffer('image/jpeg', { quality: 0.5 });
 
 
         } catch (error) {
