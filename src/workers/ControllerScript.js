@@ -7,7 +7,6 @@ const imgtobase64 = require('./jimp/IMGToBase64.js');
 const giftobase64 = require('./jimp/GifToBase64.js');
 const qrcodetext = require('./jimp/qrCode.js');
 const pixelate = require('./jimp/Pixelate.js');
-const saveImage = require('./jimp/SaveImage.js');
 
 // canvas
 const cmm = require('./canvas/ChangeMyMind.js');
@@ -208,10 +207,6 @@ process.on('message', async (message) => {
 
             case 'pixelate':
                 buffer = await pixelate.execute(body.image_url);
-            break;
-
-            case 'saveimage':
-                buffer = await saveImage.execute(body.image_url, body.file_name);
             break;
 
             case 'wtfpoe':
