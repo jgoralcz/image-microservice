@@ -37,6 +37,31 @@ the correct `args` provided. In other words, look into each file under `/src/end
 
 ### Examples
 
+I use this with `request-promise`.
+```$xslt
+options = {
+    method: 'POST',
+    uri: 'http://localhost:9002/api/' + endpoint, //endpoint is the image (see below)
+    encoding: null,
+    headers: {
+        'Content-type': 'application/json'
+    },
+    body: body,
+    json: true
+};
+```
+If you do not want a buffer and want a string (say the `ascii` endpoint), set your options to
+```$xslt
+const options =  {
+    method: 'POST',
+    uri: 'http://localhost:9002/api/ascii',
+    body: body,
+    json: true
+};
+```
+_____
+**Here are some examples with the body.**
+
 1) The `hot` endpoint requires the `image_url` \
 localhost:9002/api/hot
     ```$xslt
