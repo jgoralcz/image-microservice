@@ -140,17 +140,11 @@ process.on('message', async (message) => {
             break;
 
             case 'hot':
-                buffer = await canvasHelper.execute(message.buffers, message.buffers,
-                    {
-                        resizeX: undefined, // undefined means use the image default
-                        resizeY: 320,
-                        compositeX1: 0,
-                        compositeY1: 355
-                    });
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 600, resizeY: 320, compositeX1: 0, compositeY1: 355 });
             break;
 
             case 'ihadto':
-                buffer = await canvasHelper.execute(message.buffers, message.buffers,  { resizeX: 480, resizeY: 480, compositeX1: 0, compositeY1: 0 });
+                buffer = await canvasHelper.execute(message.buffers, body.image_url,  { resizeX: 480, resizeY: 480, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'vsauce':
@@ -209,7 +203,7 @@ process.on('message', async (message) => {
             break;
 
             case 'qrcode':
-                buffer = await qrcodetext.execute(body.image_url);
+                buffer = await qrcodetext.execute(body.text);
             break;
 
             case 'pixelate':
@@ -234,7 +228,7 @@ process.on('message', async (message) => {
             break;
 
             case 'bobross':
-                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 455, resizeY: 400, compositeX1: 5, compositeY1: 36, rotate: 0.05 });
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 455, resizeY: 340, compositeX1: 5, compositeY1: 50, rotate: 0.05 });
             break;
 
             case 'bobrosszoom':

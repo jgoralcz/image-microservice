@@ -4,11 +4,11 @@ module.exports = {
 
     /**
      * 2 images for homie.
-     * @param image_url the image url
      * @param buffer the buffer
+     * @param image_url the image url
      * @returns {Promise<*>}
      */
-    execute: async function(image_url, buffer) {
+    execute: async function(buffer, image_url) {
 
         try {
 

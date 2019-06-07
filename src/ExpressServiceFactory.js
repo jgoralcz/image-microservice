@@ -225,7 +225,7 @@ const createWorker = (script, responses) => {
         else if(typeof buffer === 'string' || buffer instanceof String) {
             response.status(200);
             response.contentType('application/json');
-            response.send(`{"content": "${buffer}"}`);
+            response.send(buffer);
         }
         else {
             response.status(500);
