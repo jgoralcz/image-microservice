@@ -195,11 +195,11 @@ process.on('message', async (message) => {
             break;
 
             case 'imgtobase64':
-                buffer = await imgtobase64.execute(body.image_url);
+                buffer.data = await imgtobase64.execute(body.image_url);
             break;
 
             case 'giftobase64':
-                buffer = await giftobase64.execute(body.image_url);
+                buffer.data = await giftobase64.execute(body.image_url);
             break;
 
             case 'qrcode':

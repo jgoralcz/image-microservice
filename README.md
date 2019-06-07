@@ -71,7 +71,7 @@ ___
 
 ## Pull Requests
 If you would like to add your own fun creation, feel free to make a pull request!
-My only request is to follow the current structure that is provided and make sure it the endpoint is appropriate.
+My only request is to follow the current structure that is provided and make sure the endpoint is appropriate.
 
 ___
 
