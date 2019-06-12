@@ -127,7 +127,7 @@ process.on('message', async (message) => {
             break;
 
             case 'dio':
-                buffer = await canvasHelper.execute(message.buffers, message.buffers, { resizeX: 934, resizeY: 720, compositeX1: 0, compositeY1: 0 });
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 934, resizeY: 720, compositeX1: 0, compositeY1: 0 });
             break;
 
             case 'dateline':
