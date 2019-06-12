@@ -261,7 +261,15 @@ process.on('message', async (message) => {
 
             case 'whyfbihere':
                 buffer = await whyFBIHere.execute(message.buffers, body.text);
+            break;
 
+            case 'wtfpikachu':
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 535, resizeY: 370, compositeX1: 0, compositeY1: 0 });
+            break;
+
+            case '10haunting':
+                buffer = await canvasHelper.execute(message.buffers, body.image_url, { resizeX: 500, resizeY: 290, compositeX1: 0, compositeY1: 0 });
+            break;
         }
 
     } catch (error) {
