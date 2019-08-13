@@ -1,50 +1,44 @@
 const { createCanvas, Image, loadImage } = require('canvas');
 
 module.exports = {
-    desiredVal: 480,
+  desiredVal: 480,
 
-    /**
-     * generates the image.
-     * @param images my local image (bazinga)
-     * @param image_url the user's image
-     * @returns {Promise<*>}
-     */
+  /**
+   * generates the image.
+   * @param images my local image (bazinga)
+   * @param imageURL the user's image
+   * @returns {Promise<*>}
+   */
+  async execute(images, imageURL) {
+    try {
+      // get their image
+      const theirImage = await loadImage(imageURL);
 
-    execute: async function(images, image_url) {
-        try {
-            // get their image
-            const theirImage = await loadImage(image_url);
+      const myImage = new Image();
+      myImage.src = Buffer.from(images[0]);
 
-            let myImage = new Image();
-            myImage.src = Buffer.from(images[0]);
+      let { width } = theirImage;
+      let { height } = theirImage;
+      // get height and width to test against
+      if (width < this.desiredVal && height < this.desiredVal) {
+        height = this.desiredVal;
+        width = this.desiredVal;
+      } else if (height < this.desiredVal) {
+        width *= (height / this.desiredVal);
+        height = this.desiredVal;
+      }
 
+      const canvas = createCanvas(width, height);
+      const ctx = canvas.getContext('2d');
 
-            let width = theirImage.width;
-            let height = theirImage.height;
-            // get height and width to test against
-            if(width < this.desiredVal && height < this.desiredVal) {
-                height = this.desiredVal;
-                width = this.desiredVal;
-            }
-            else if(height < this.desiredVal) {
-                width = width*(height/this.desiredVal);
-                height = this.desiredVal;
-            }
+      ctx.drawImage(theirImage, 0, 0, width, height);
+      ctx.drawImage(myImage, 0, 0, width, height);
 
-
-            let canvas = createCanvas(width, height);
-            let ctx = canvas.getContext('2d');
-
-            ctx.drawImage(theirImage, 0, 0, width, height);
-            ctx.drawImage(myImage, 0, 0, width, height);
-
-            return canvas.toBuffer('image/jpeg', undefined);
-
-
-        } catch(error) {
-            console.error(error);
-        }
-
-        return undefined;
+      return canvas.toBuffer('image/jpeg', undefined);
+    } catch (error) {
+      console.error(error);
     }
+
+    return undefined;
+  },
 };

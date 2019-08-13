@@ -1,5 +1,5 @@
 module.exports = {
-    name: 'notetext',
-    filepaths: ['./assets/images/noteText.jpg'],
-    args: ['text']
+  name: 'notetext',
+  filepaths: ['./assets/images/noteText.jpg'],
+  args: ['text'],
 };

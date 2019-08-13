@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'pixelate',
-    args: ['image_url', 'number']
+module.exports = {
+  name: 'pixelate',
+  args: ['image_url', 'number'],
 };

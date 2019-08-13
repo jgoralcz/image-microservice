@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'ascii',
-    args: ['image_url']
+module.exports = {
+  name: 'ascii',
+  args: ['image_url'],
 };

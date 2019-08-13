@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'blur',
-    args: ['image_url', 'number']
+module.exports = {
+  name: 'blur',
+  args: ['image_url', 'number'],
 };

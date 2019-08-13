@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'imgtobase64',
-    args: ['image_url'],
+module.exports = {
+  name: 'imgtobase64',
+  args: ['image_url'],
 };

@@ -1,5 +1,5 @@
-module.exports =  {
-    name: 'dateline',
-    args: ['image_url'],
-    filepaths: ['./assets/images/dateline.png']
+module.exports = {
+  name: 'dateline',
+  args: ['image_url'],
+  filepaths: ['./assets/images/dateline.png'],
 };

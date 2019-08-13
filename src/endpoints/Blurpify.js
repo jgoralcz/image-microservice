@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'blurpify',
-    args: ['image_url']
+module.exports = {
+  name: 'blurpify',
+  args: ['image_url'],
 };

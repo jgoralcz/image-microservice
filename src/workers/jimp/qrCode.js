@@ -2,20 +2,17 @@ const qr = require('qr-image');
 
 module.exports = {
 
-    /**
-     * generates the image.
-     * @param image_url the user's image
-     * @returns {Promise<*>}
-     */
-
-    execute: async function (image_url) {
-        try {
-            return await qr.imageSync(image_url, {type: 'png'});
-        }
-        catch(error) {
-            console.error(error);
-        }
-
-        return undefined;
+  /**
+   * generates the image.
+   * @param imageURL the user's image
+   * @returns {Promise<*>}
+   */
+  async execute(imageURL) {
+    try {
+      return await qr.imageSync(imageURL, { type: 'png' });
+    } catch (error) {
+      console.error(error);
     }
+    return undefined;
+  },
 };

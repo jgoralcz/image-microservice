@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'deepfry',
-    args: ['image_url']
+module.exports = {
+  name: 'deepfry',
+  args: ['image_url'],
 };

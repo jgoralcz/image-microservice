@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'sharpen',
-    args: ['image_url', 'number']
+module.exports = {
+  name: 'sharpen',
+  args: ['image_url', 'number'],
 };

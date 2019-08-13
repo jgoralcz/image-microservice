@@ -1,4 +1,4 @@
-module.exports =  {
-    name: 'qrcode',
-    args: ['text'],
+module.exports = {
+  name: 'qrcode',
+  args: ['text'],
 };

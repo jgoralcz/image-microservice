@@ -1,5 +1,5 @@
-module.exports =  {
-    name: 'sonicsays',
-    args: ['text'],
-    filepaths: ['./assets/images/sonicSays.jpg']
+module.exports = {
+  name: 'sonicsays',
+  args: ['text'],
+  filepaths: ['./assets/images/sonicSays.jpg'],
 };

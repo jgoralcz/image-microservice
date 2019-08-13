@@ -1,5 +1,5 @@
-module.exports =  {
-    name: 'hatkidsays',
-    args: ['text'],
-    filepaths: ['./assets/images/hatkidsays_nonsmug.png']
+module.exports = {
+  name: 'hatkidsays',
+  args: ['text'],
+  filepaths: ['./assets/images/hatkidsays_nonsmug.png'],
 };
