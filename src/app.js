@@ -24,3 +24,5 @@ app.use('/', async (req, res) => {
   res.status(400);
   res.send('Please use the correct endpoints. See the github repo for the endpoints and check in the /src/endpoints folder.');
 });
+
+module.exports = app;

@@ -6,12 +6,12 @@ app.listen(port, () => {
   console.log(`Image microservice running at port ${port}`);
 });
 
-// shows where the rejection occured
+// shows where the rejection occurred
 process.on('unhandledRejection', (reason, p) => {
   console.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
 });
 
-// shows where the rejection occured
+// shows where the rejection occurred
 process.on('uncaughtException', (err) => {
   console.error(`${(new Date()).toUTCString()} uncaughtException:`, err.message);
   console.error(err.stack);

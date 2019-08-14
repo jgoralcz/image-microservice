@@ -13,16 +13,15 @@ RUN apt-get update -y && apt-get install -y graphicsmagick graphicsmagick-imagem
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
-RUN npm install sharp && npm install canvas && npm install pm2 -g && npm install
-#RUN npm install sharp && npm install canvas && npm install
+RUN npm install sharp && npm install canvas && npm install
+#RUN npm install sharp && npm install canvas && npm install pm2 -g && npm install
 
 # Bundle app source
 COPY . .
 
 EXPOSE 9002
 
-CMD ["pm2-runtime", "app.js"]
-#CMD ["node", "app.js"]
+CMD ["node", "./src/server.js", "3"]
 
 
 

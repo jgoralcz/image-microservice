@@ -4,7 +4,7 @@ This microservice uses about 500mb of ram when starting out and can be up to 900
 A default of 3 processes is created. Processes are indeed heavy. Only create more if you really need the concurency. 
 As a result, we are patiently waiting for both sharp and node-canvas to support worker-threads. 
 You may need fewer or more depending on your use case. If that's the case then you must specify that when running
-docker by inputting a number. Example (in the dockerfile): `CMD ["node", "app.js", "10"]` will spawn 10 child processes
+docker by inputting a number. Example (in the dockerfile): `CMD ["node", "./src/server.js", "10"]` will spawn 10 child processes
  (hopefully worker threads in the future).
 
 If your node version is less than 11.5 you must use `node --experimental-worker app.js` (unless you use the dockerfile)
@@ -24,7 +24,7 @@ To build and run it I do something like so: \
 `git clone https://github.com/jgoralcz/image-microservice`
 `cd image-microservice`
 `docker build -t image_mims .` \
-`docker run -d -p 9002:9002 --name container_mims image_mims --memory="2048m"`
+`docker run -d -p 9002:9002 --restart=always --memory="2048m" --name container_mims image_mims`
 
 ___
 
