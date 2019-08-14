@@ -51,6 +51,7 @@ const createWorker = (script, responses) => {
 
     // get our response to send back to.
     const response = await filterResponses(responses, requestNum);
+    console.log(response);
 
     if (!response) {
       console.error('Could not find response for this requested number.');
@@ -106,7 +107,6 @@ module.exports = {
         // (2 minutes because it should only take a max of 2 seconds to process an image.)
         for (let i = 0; i < this.responses.length; i += 1) {
           let response = this.responses[i];
-
           // check by the timestamp
           if (response.timestamp) {
             const time = response.timestamp.getTime();
@@ -114,13 +114,15 @@ module.exports = {
 
             // get time makes sure it's greater than 2 minutes
             if (new Date().getTime() - time > twoMinutes) {
+              console.log('cleaning');
               response = this.responses[i].res;
               this.responses.splice(i, 1);
             }
           }
+          console.log(this.responses);
         }
       }
-    }, 10000); // 10 minutes
+    }, 6e5); // 10 minutes
   },
 
   /**
@@ -202,6 +204,7 @@ module.exports = {
     // push request onto array
     // timestamp in case something happens,
     // we want to remove the requests that are older than 5 minutes.
+    console.log('pushing');
     this.responses.push({ requestNum: this.requestNum, res, timestamp: new Date() });
 
     // simple way of queueing the threads/processes

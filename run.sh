@@ -7,7 +7,7 @@ if [ ! -d ./src ]; then
     cd image-microservice || exit
     echo "done cloning repo..."
   else
-    echo "You need to somehow clone the link to use it: https://github.com/jgoralcz/image-microservice"
+    echo "You need to clone the repo to use this microservice: https://github.com/jgoralcz/image-microservice"
   fi
 fi
 ls

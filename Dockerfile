@@ -11,7 +11,14 @@ RUN apt-get update && apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-d
 # graphicsmagick (jimp)
 RUN apt-get update -y && apt-get install -y graphicsmagick graphicsmagick-imagemagick-compat
 RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
+
+# the following is taken from: https://github.com/lovell/sharp/issues/955
+RUN apt-get update && apt-get install --force-yes -yy \
+  libjemalloc1 \
+  && rm -rf /var/lib/apt/lists/*
+
+# Change memory allocator to avoid leaks
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
 RUN npm install sharp && npm install canvas && npm install
 #RUN npm install sharp && npm install canvas && npm install pm2 -g && npm install
@@ -21,7 +28,7 @@ COPY . .
 
 EXPOSE 9002
 
-CMD ["node", "./src/server.js", "3"]
+CMD ["node", "./src/server.js", "5"]
 
 
 

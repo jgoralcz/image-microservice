@@ -40,8 +40,8 @@ module.exports = {
         const replaceColor = {
           r: 35, g: 35, b: 35, a: 60,
         }; // Color you want to replace with by calculating the distance between two colors.
-        const colorDistance = (c1, c2) => Math.sqrt((c1.r - c2.r)(c1.r - c2.r) + (c1.g - c2.g)(c1.g - c2.g)
-          + (c1.b - c2.b)(c1.b - c2.b) + (c1.a - c2.a)(c1.a - c2.a));
+        const colorDistance = (c1, c2) => Math.sqrt(((c1.r - c2.r) * (c1.r - c2.r) + (c1.g - c2.g) * (c1.g - c2.g)
+          + (c1.b - c2.b) * (c1.b - c2.b) + (c1.a - c2.a) * (c1.a - c2.a)));
         image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
           const thisColor = {
             r: image.bitmap.data[idx],
