@@ -21,8 +21,8 @@ COPY . .
 
 EXPOSE 9002
 
-CMD ["pm2-runtime", "index.js"]
-#CMD ["node", "index.js"]
+CMD ["pm2-runtime", "app.js"]
+#CMD ["node", "app.js"]
 
 
 

@@ -15,7 +15,7 @@ module.exports = {
     // Start calculation
     while (text.length) {
       let i;
-      for (i = text.length; ctx.measureText(text.substr(0, i)).width > maxWidth; i--) ;
+      for (i = text.length; ctx.measureText(text.substr(0, i)).width > maxWidth; i -= 1) ;
 
       const result = text.substr(0, i);
 

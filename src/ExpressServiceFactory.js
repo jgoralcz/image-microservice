@@ -36,7 +36,7 @@ const createWorker = (script, responses) => {
         const response = await filterResponses(responses, message.requestNum);
         response.status(500);
         response.contentType('application/json');
-        response.send('{"error": "server error, image has errors."}');
+        response.send('{ "error": "server error, image has errors." }');
       }
       return;
     }
@@ -44,6 +44,7 @@ const createWorker = (script, responses) => {
     let buffer = message.buffer.data;
     const { requestNum } = message;
 
+    // make sure we have the right buffer.
     if (buffer != null && (typeof buffer !== 'string' && !(buffer instanceof String))) {
       buffer = Buffer.from(buffer);
     }
@@ -69,7 +70,7 @@ const createWorker = (script, responses) => {
     } else {
       response.status(500);
       response.contentType('application/json');
-      response.send('{"error": "server error, image has errors."}');
+      response.send('{ "error": "server error, image has errors." }');
     }
   });
 
@@ -87,10 +88,10 @@ module.exports = {
   interval: undefined,
 
   /**
-     * inits the service.
-     * @param app the express app
-     * @param numThreads the number of worker threads.
-     */
+   * inits the service.
+   * @param app the express app
+   * @param numThreads the number of worker threads.
+   */
   init(app, numThreads) {
     this.dir = `./src${this.endpoints}`;
     this.expressApp = app;
@@ -123,14 +124,13 @@ module.exports = {
   },
 
   /**
-     * Creates the services and workers by looping over each filepath.
-     * If a filepath has its own initService, we ignore it, and run theirs instead.
-     * This is because Node-Canvas and Sharp use their own threading.
-     * Additionally, it's up to the user if they want to add their own.
-     */
+   * Creates the services and workers by looping over each filepath.
+   * If a filepath has its own initService, we ignore it, and run theirs instead.
+   * This is because Node-Canvas and Sharp use their own threading.
+   * Additionally, it's up to the user if they want to add their own.
+   */
   createServicesAndWorkers() {
-    // create new worker threads based off their specification for the main script
-    // this script does not use node-canvas or sharp because they use their own threading.
+    // create new processes (worker threads in the future) based off their specification for the main script
     this.workerArray = new Array(this.maxThreads);
 
     // persist the workers into its own array
@@ -218,7 +218,7 @@ module.exports = {
       if (worker == null) {
         res.status(500);
         res.contentType('application/json');
-        res.send('{"error": "Major Internal Error. Please notify the owners."}');
+        res.send('{ "error": "Major Internal Error. Please notify the owners." }');
         return;
       }
     }
