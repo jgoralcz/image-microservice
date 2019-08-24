@@ -25,6 +25,7 @@ const deepfry = require('./canvas/DeepFry.js');
 const overfry = require('./canvas/OverFry.js');
 const billyYes = require('./canvas/BillyYes');
 const yerin = require('./canvas/Yerin');
+const water = require('./canvas/Water');
 
 const homie = require('./jimp/Homie.js');
 
@@ -108,6 +109,10 @@ process.on('message', async (message) => {
 
       case 'rdog':
         buffer = await rdog.execute(message.buffers, body.text);
+        break;
+
+      case 'water':
+        buffer = await water.execute(message.buffers, body.text);
         break;
 
       case 'trumphold':

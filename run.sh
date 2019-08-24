@@ -10,7 +10,6 @@ if [ ! -d ./src ]; then
     echo "You need to clone the repo to use this microservice: https://github.com/jgoralcz/image-microservice"
   fi
 fi
-ls
 # check for docker
 if [ -x "$(command -v docker)" ]; then
   # check if container already exists

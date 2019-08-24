@@ -1,7 +1,6 @@
 const { createCanvas, Image } = require('canvas');
 const line = require('../WorkerHelpers/GetLinesHelper.js');
 
-
 module.exports = {
   /**
    * gets the buffer from canvas
@@ -21,46 +20,40 @@ module.exports = {
 
       // draw image
       ctx.drawImage(img, 0, 0, img.width, img.height);
+      text = text.toUpperCase();
 
       const x = text.length;
-      // let fontSize = 11;
-      let fontSize = 70;
-      // ctx.translate(310, 340);
+      let fontSize = 40;
+      let my = 0;
+      // eslint-disable-next-line no-empty
       if (x <= 15) {
-        ctx.translate(310, 365);
       } else if (x <= 30) {
-        fontSize = 50;
-        ctx.translate(315, 365);
-      } else if (x <= 70) {
-        fontSize = 40;
-        ctx.translate(315, 365);
-      } else if (x <= 85) {
         fontSize = 32;
-        ctx.translate(315, 365);
+      } else if (x <= 70) {
+        fontSize = 25;
+      } else if (x <= 85) {
+        fontSize = 22;
       } else if (x < 100) {
-        fontSize = 26;
-        ctx.translate(315, 365);
+        fontSize = 18;
       } else if (x < 120) {
-        fontSize = 21;
-        ctx.translate(315, 365);
+        fontSize = 15;
       } else if (x < 180) {
+        my = 5;
         // 0.000278x^2\ -.177x\ +\ 36.37
-        fontSize = 0.0032 * (x * x) - 0.878 * x + 80.545; // before 76.545
-        ctx.translate(315, 365);
+        fontSize = 0.0032 * (x * x) - 0.878 * x + 76.545;
       } else if (x < 700) {
+        my = 10;
         // y\ =\ 0.00000915x^2\ -\ 0.018x+14.45
-        fontSize = 0.0000168 * (x * x) - 0.0319 * x + 23.62;
-        ctx.translate(310, 338);
+        fontSize = 0.0000168 * (x * x) - 0.0365 * x + 21.62;
       } else {
         fontSize = 7;
-        ctx.translate(310, 335);
       }
-      ctx.font = `${fontSize}px 'Arial'`;
-      ctx.rotate(-0.39575);
+      ctx.font = `${fontSize}px 'Futura'`;
+      ctx.translate(180, 75 - my);
 
-      const lines = line.getLines(ctx, text, 345);
+      const lines = line.getLines(ctx, text, 205);
       for (let i = 0; i < lines.length; i++) {
-        ctx.fillText(lines[i], 10, (i * fontSize) - 5);
+        ctx.fillText(lines[i], 10, (i * fontSize) + 2);
       }
 
       return canvas.toBuffer('image/jpeg', undefined);
