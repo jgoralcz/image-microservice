@@ -326,6 +326,11 @@ process.on('message', async (message) => {
         });
         break;
 
+      case 'simplerick':
+        buffer = await canvasHelper.execute(message.buffers, body.image_url, {
+          resizeX: 155, resizeY: 110, compositeX1: 225, compositeY1: 115, rotate: 0.13,
+        });
+        break;
 
       case '10haunting':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
