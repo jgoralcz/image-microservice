@@ -24,6 +24,7 @@ const fry = require('./canvas/Fried.js');
 const deepfry = require('./canvas/DeepFry.js');
 const overfry = require('./canvas/OverFry.js');
 const billyYes = require('./canvas/BillyYes');
+const yerin = require('./canvas/Yerin');
 
 const homie = require('./jimp/Homie.js');
 
@@ -283,6 +284,10 @@ process.on('message', async (message) => {
 
       case 'changemymind':
         buffer = await cmm.execute(message.buffers, body.text);
+        break;
+
+      case 'yerin':
+        buffer = await yerin.execute(message.buffers, body.text);
         break;
 
       case 'achievement':
