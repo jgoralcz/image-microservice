@@ -204,7 +204,6 @@ module.exports = {
     // push request onto array
     // timestamp in case something happens,
     // we want to remove the requests that are older than 5 minutes.
-    console.log('pushing');
     this.responses.push({ requestNum: this.requestNum, res, timestamp: new Date() });
 
     // simple way of queueing the threads/processes

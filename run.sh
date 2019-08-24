@@ -27,7 +27,7 @@ if [ -x "$(command -v docker)" ]; then
       docker rm container_mims
   fi
   docker build -t image_mims .
-  docker run -d -p 9002:9002 -m 1GB --name container_mims image_mims
+  docker run -d -p 9002:9002 -m 2GB --name container_mims image_mims
 else
   echo "!!!!YOU MUST INSTALL DOCKER!!!!"
   echo "To install docker on debian or ubuntu: curl -sSL https://get.docker.com/ | bash"

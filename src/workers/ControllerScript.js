@@ -23,6 +23,7 @@ const hatkidsays = require('./canvas/HatKidSays.js');
 const fry = require('./canvas/Fried.js');
 const deepfry = require('./canvas/DeepFry.js');
 const overfry = require('./canvas/OverFry.js');
+const billyYes = require('./canvas/BillyYes');
 
 const homie = require('./jimp/Homie.js');
 
@@ -315,11 +316,16 @@ process.on('message', async (message) => {
         buffer = await whyFBIHere.execute(message.buffers, body.text);
         break;
 
+      case 'billyyes':
+        buffer = await billyYes.execute(message.buffers, body.text);
+        break;
+
       case 'wtfpikachu':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
           resizeX: 535, resizeY: 370, compositeX1: 0, compositeY1: 0,
         });
         break;
+
 
       case '10haunting':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {

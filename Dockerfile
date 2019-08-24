@@ -28,7 +28,7 @@ COPY . .
 
 EXPOSE 9002
 
-CMD ["node", "./src/server.js", "5"]
+CMD ["node", "./src/server.js", "3"]
 
 
 
