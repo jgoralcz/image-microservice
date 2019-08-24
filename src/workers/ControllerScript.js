@@ -179,6 +179,12 @@ process.on('message', async (message) => {
         });
         break;
 
+      case 'spongeboblook':
+        buffer = await canvasHelper.execute(message.buffers, body.image_url, {
+          resizeX: 400, resizeY: 400, compositeX1: 0, compositeY1: 215,
+        });
+        break;
+
       case 'hot':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
           resizeX: 600, resizeY: 320, compositeX1: 0, compositeY1: 355,
