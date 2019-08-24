@@ -26,6 +26,7 @@ const overfry = require('./canvas/OverFry.js');
 const billyYes = require('./canvas/BillyYes');
 const yerin = require('./canvas/Yerin');
 const water = require('./canvas/Water');
+const graph = require('./canvas/Graph');
 
 const homie = require('./jimp/Homie.js');
 
@@ -313,6 +314,10 @@ process.on('message', async (message) => {
 
       case 'notetext':
         buffer = await noteText.execute(message.buffers, body.text);
+        break;
+
+      case 'graph':
+        buffer = await graph.execute(message.buffers, body.text1, body.text2);
         break;
 
       case 'pengu':
