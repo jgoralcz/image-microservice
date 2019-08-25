@@ -28,6 +28,7 @@ const yerin = require('./canvas/Yerin');
 const water = require('./canvas/Water');
 const graph = require('./canvas/Graph');
 const pa = require('./canvas/PresidentialAlert');
+const certificate = require('./canvas/Certificate');
 
 const homie = require('./jimp/Homie.js');
 
@@ -363,8 +364,15 @@ process.on('message', async (message) => {
           resizeX: 500, resizeY: 290, compositeX1: 0, compositeY1: 0,
         });
         break;
+
+      case 'certificate':
+        buffer = await certificate.execute(message.buffers, body.name,
+          body.reason, body.date, body.signature);
+        break;
+
       default:
         buffer = undefined;
+        break;
     }
   } catch (error) {
     console.error(error);
