@@ -27,6 +27,7 @@ const billyYes = require('./canvas/BillyYes');
 const yerin = require('./canvas/Yerin');
 const water = require('./canvas/Water');
 const graph = require('./canvas/Graph');
+const pa = require('./canvas/PresidentialAlert');
 
 const homie = require('./jimp/Homie.js');
 
@@ -314,6 +315,10 @@ process.on('message', async (message) => {
 
       case 'notetext':
         buffer = await noteText.execute(message.buffers, body.text);
+        break;
+
+      case 'presidentialalert':
+        buffer = await pa.execute(message.buffers, body.text);
         break;
 
       case 'graph':
