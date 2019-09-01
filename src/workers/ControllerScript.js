@@ -29,6 +29,7 @@ const water = require('./canvas/Water');
 const graph = require('./canvas/Graph');
 const pa = require('./canvas/PresidentialAlert');
 const certificate = require('./canvas/Certificate');
+const jail = require('./canvas/Jail');
 
 const homie = require('./jimp/Homie.js');
 
@@ -239,6 +240,10 @@ process.on('message', async (message) => {
 
       case 'bazinga':
         buffer = await bazinga.execute(message.buffers, body.image_url);
+        break;
+
+      case 'jail':
+        buffer = await jail.execute(message.buffers, body.image_url);
         break;
 
       case 'blur':
