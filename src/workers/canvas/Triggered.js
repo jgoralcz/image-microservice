@@ -1,7 +1,8 @@
 const { createCanvas, Image, loadImage } = require('canvas');
+const GIFEncoder = require('gifencoder');
+const fs = require('fs');
 
 const d = 280;
-
 
 module.exports = {
   /**
@@ -12,6 +13,13 @@ module.exports = {
    */
   execute: async (images, image) => {
     try {
+      // use gifencoder
+      const encoder = new GIFEncoder(d, d);
+      const stream = encoder.createReadStream();
+      encoder.start();
+      encoder.setRepeat(0); // 0 for repeat
+      encoder.setDelay(1); // frame delay in ms
+
       // load triggered as node-canvas data.
       const triggeredImage = new Image();
       triggeredImage.src = Buffer.from(images[0]);
@@ -33,7 +41,15 @@ module.exports = {
 
       // draw triggered image
       ctx.drawImage(triggeredImage, 0, d - triggeredImage.height, triggeredImage.width, triggeredImage.height);
-      return canvas.toBuffer('image/jpeg', undefined);
+      encoder.addFrame(ctx);
+
+      // translate frame 2
+      ctx.translate(3, 4);
+      encoder.addFrame(ctx);
+      ctx.translate(-3, -4);
+      encoder.addFrame(ctx);
+      // return canvas.toBuffer('image/jpeg', undefined);
+      encoder.finish();
     } catch (error) {
       console.error(error);
     }
