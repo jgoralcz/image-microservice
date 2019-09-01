@@ -47,7 +47,7 @@ module.exports = {
       // color it back to black and write their message.
       const fontSize = 36;
       ctx.font = `${fontSize}px 'Helvetica Neue'`;
-      ctx.translate(-550, 420);
+      ctx.translate(50, 860);
       canvas.fillStyle = '#000000';
       ctx.textAlign = 'left';
       const lines = line.getLines(ctx, text, 1125);

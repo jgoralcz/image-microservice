@@ -141,7 +141,7 @@ process.on('message', async (message) => {
 
       case 'payrespects':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
-          resizeX: 98, resizeY: 125, compositeX1: 70, compositeY1: -12, rotate: -0.09,
+          resizeX: 92, resizeY: 135, compositeX1: 75, compositeY1: -18, rotate: -0.11,
         });
         break;
 
@@ -155,6 +155,12 @@ process.on('message', async (message) => {
       case 'sunnyframequote':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
           resizeX: 275, resizeY: 475, compositeX1: 155, compositeY1: 25, rotate: -0.03,
+        });
+        break;
+
+      case 'ugly':
+        buffer = await canvasHelper.execute(message.buffers, body.image_url, {
+          resizeX: 170, resizeY: 170, compositeX1: 120, compositeY1: 50,
         });
         break;
 
