@@ -30,6 +30,7 @@ const graph = require('./canvas/Graph');
 const pa = require('./canvas/PresidentialAlert');
 const certificate = require('./canvas/Certificate');
 const jail = require('./canvas/Jail');
+const triggered = require('./canvas/Triggered');
 
 const homie = require('./jimp/Homie.js');
 
@@ -356,6 +357,10 @@ process.on('message', async (message) => {
 
       case 'billyyes':
         buffer = await billyYes.execute(message.buffers, body.text);
+        break;
+
+      case 'triggered':
+        buffer = await triggered.execute(message.buffers, body.image_url);
         break;
 
       case 'wtfpikachu':
