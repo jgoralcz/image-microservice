@@ -42,7 +42,7 @@ const createWorker = (script, responses) => {
     }
 
     let buffer = message.buffer.data;
-    const { requestNum } = message;
+    const { requestNum, contentType } = message;
 
     // make sure we have the right buffer.
     if (buffer != null && (typeof buffer !== 'string' && !(buffer instanceof String))) {
@@ -51,7 +51,6 @@ const createWorker = (script, responses) => {
 
     // get our response to send back to.
     const response = await filterResponses(responses, requestNum);
-    console.log(response);
 
     if (!response) {
       console.error('Could not find response for this requested number.');
@@ -61,7 +60,7 @@ const createWorker = (script, responses) => {
     // make sure we have an uint8array
     if (buffer instanceof Uint8Array) {
       response.status(200);
-      response.contentType('image/jpg');
+      response.contentType(contentType);
       response.send(buffer);
       // send string if we have that (for ascii images or url)
     } else if (typeof buffer === 'string' || buffer instanceof String) {
@@ -228,7 +227,7 @@ module.exports = {
     if (worker != null) {
       // send the message
       worker.send({
-        endpoint: module.name, body, buffers: module.buffers, requestNum: this.requestNum,
+        endpoint: module.name, body, buffers: module.buffers, requestNum: this.requestNum, contentType: module.contentType || 'image/jpeg',
       });
     }
 

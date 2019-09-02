@@ -45,9 +45,7 @@ const blur = require('./sharp/Blur.js');
 process.on('message', async (message) => {
   let buffer = {};
   try {
-    const { endpoint } = message;
-    const { body } = message;
-
+    const { body, endpoint } = message;
     switch (endpoint) {
       case 'bodypillow':
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
@@ -395,5 +393,5 @@ process.on('message', async (message) => {
   }
 
   // send back message buffer and request number
-  process.send({ buffer, requestNum: message.requestNum });
+  process.send({ buffer, requestNum: message.requestNum, contentType: message.contentType });
 });
