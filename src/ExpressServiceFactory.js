@@ -163,7 +163,7 @@ module.exports = {
         for (let i = 0; i < endpoint.filepaths.length; i += 1) {
           // read gifs special because they have more than 1 buffer.
           if (endpoint.filepaths[i].endsWith('gif')) {
-            const frames = await gifFrames({url: endpoint.filepaths[i], frames: 'all'});
+            const frames = await gifFrames({ url: endpoint.filepaths[i], frames: 'all' });
             for (let f = 0; f < frames.length; f += 1) {
               const accumulator = new MyBufferAccumulator();
               frames[f].getImage().pipe(accumulator);

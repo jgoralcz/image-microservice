@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install --force-yes -yy \
 # Change memory allocator to avoid leaks
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
-RUN npm install sharp && npm install canvas && npm install gif-encoder-2 && npm install gif-frames && npm install
+RUN npm install sharp && npm install canvas && npm install gif-encoder-2 && npm install gifencoder && npm install gif-frames && npm install
 #RUN npm install sharp && npm install canvas && npm install pm2 -g && npm install
 
 # Bundle app source
@@ -28,7 +28,7 @@ COPY . .
 
 EXPOSE 9002
 
-CMD ["node", "./src/server.js", "10"]
+CMD ["node", "./src/server.js", "3"]
 
 
 

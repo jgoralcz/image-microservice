@@ -19,18 +19,15 @@ module.exports = {
       // use gifencoder
       // create our new accumulator
       const myAccumulator = new MyBufferAccumulator();
-      const encoder = new GIFEncoder(imageD, imageD, 'neuquant', true);
+      const encoder = new GIFEncoder(imageD, imageD, 'octree', false);
       encoder.createReadStream().pipe(myAccumulator);
       encoder.start();
-      encoder.setQuality(1);
-      encoder.setDelay(40);
-      encoder.setDispose(2);
+      encoder.setQuality(30);
+      encoder.setDelay(90);
 
       // get our canvas and buffer
       const canvas = createCanvas(imageD, imageD);
       const ctx = canvas.getContext('2d');
-      ctx.quality = 'fast';
-      ctx.patternQuality = 'fast';
 
       // resize their image so we don't have to do it each time.
       const ctxResize = canvas.getContext('2d');
@@ -39,16 +36,16 @@ module.exports = {
       theirImage.src = Buffer.from(buffer);
 
       // loop over all images.
-      const length = (images.length > 65) ? 65 : images.length;
-      for (let i = 0; i < length - 1; i += 1) {
+      console.log(images.length);
+      for (let i = 0; i < images.length; i += 1) {
         ctx.globalAlpha = 1;
         const background = new Image();
         background.src = Buffer.from(images[i]);
-        ctx.drawImage(background, 0, 0, imageD, imageD);
+        ctx.drawImage(background, 0, 0);
 
         // get buffer and resize our image to our length
-        ctx.globalAlpha = 0.4;
-        ctx.drawImage(theirImage, 0, 0, imageD, imageD);
+        // ctx.globalAlpha = 0.4;
+        // ctx.drawImage(theirImage, 0, 0);
         encoder.addFrame(ctx);
       }
       encoder.finish();

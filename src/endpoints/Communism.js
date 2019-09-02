@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'america',
+  name: 'communism',
   args: ['image_url'],
-  filepaths: ['./assets/images/america.gif'],
+  filepaths: ['./assets/images/communism.gif'],
   contentType: 'image/gif',
 };

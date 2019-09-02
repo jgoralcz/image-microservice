@@ -32,6 +32,7 @@ const certificate = require('./canvas/Certificate');
 const jail = require('./canvas/Jail');
 const triggered = require('./canvas/Triggered');
 const america = require('./canvas/America');
+const weeb = require('./canvas/Weeb');
 
 const homie = require('./jimp/Homie.js');
 
@@ -388,6 +389,15 @@ process.on('message', async (message) => {
 
       case 'america':
         buffer = await america.execute(message.buffers, body.image_url);
+        break;
+
+      // don't tell anyone I'm using the america endpoint for this.
+      case 'communism':
+        buffer = await america.execute(message.buffers, body.image_url);
+        break;
+
+      case 'weeb':
+        buffer = await weeb.execute(message.buffers, body.image_url);
         break;
 
 
