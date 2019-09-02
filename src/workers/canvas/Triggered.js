@@ -1,41 +1,16 @@
 const { createCanvas, Image, loadImage } = require('canvas');
 const GIFEncoder = require('gif-encoder-2');
-const { Writable } = require('stream');
-
-/**
- * Returns a random number between min (inclusive) and max (exclusive)
- */
-function getRandomArbitrary(min, max) {
-  return Math.random() * (max - min) + min;
-}
+const MyBufferAccumulator = require('../WorkerHelpers/BufferAccumulator');
 
 const d = 256;
 const imageD = 324;
-// const dimensions = 256;
 
-class MyBufferAccumulator extends Writable {
-  constructor() {
-    super();
-    this.accumulator = Buffer.from('');
-    this.finished = false;
-    this.once('finish', () => { this.finished = true; });
-  }
-
-  _write(chunk, encoding, callback) {
-  // tslint:disable-next-line:no-console
-    this.accumulator = Buffer.concat([this.accumulator, chunk]);
-    if (typeof encoding === 'function') { encoding(); }
-    if (typeof callback === 'function') { callback(); }
-  }
-
-  async getBuffer() {
-    if (this.finished) { return this.accumulator; }
-    return new Promise((rs, rj) => {
-      this.once('finish', () => rs(this.accumulator));
-      this.once('error', (err) => rj(err));
-    });
-  }
-}
+/**
+ * returns a random number between min (inclusive) and max (exclusive)
+ * @param min the min num.
+ * @param max the max num.
+ */
+const getRandomArbitrary = (min, max) => Math.random() * (max - min) + min;
 
 module.exports = {
   /**

@@ -31,6 +31,7 @@ const pa = require('./canvas/PresidentialAlert');
 const certificate = require('./canvas/Certificate');
 const jail = require('./canvas/Jail');
 const triggered = require('./canvas/Triggered');
+const america = require('./canvas/America');
 
 const homie = require('./jimp/Homie.js');
 
@@ -40,6 +41,7 @@ const loadBuffer = require('./canvas/LoadBuffer.js');
 // sharp
 const sharpen = require('./sharp/Sharpen.js');
 const blur = require('./sharp/Blur.js');
+
 
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
@@ -383,6 +385,12 @@ process.on('message', async (message) => {
         buffer = await certificate.execute(message.buffers, body.name,
           body.reason, body.date, body.signature);
         break;
+
+      case 'america':
+        console.log('made it');
+        buffer = await america.execute(message.buffers, body.image_url);
+        break;
+
 
       default:
         buffer = undefined;
