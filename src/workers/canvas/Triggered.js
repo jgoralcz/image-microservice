@@ -59,7 +59,7 @@ module.exports = {
       const ctx = canvas.getContext('2d');
 
       for (let i = 0; i < 8; i += 1) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (i === 0) {
           // draw their image
           ctx.drawImage(theirImage, -18, -18);

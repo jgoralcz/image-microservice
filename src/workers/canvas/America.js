@@ -1,19 +1,6 @@
 const { createCanvas, Image, loadImage } = require('canvas');
 const GIFEncoder = require('gif-encoder-2');
-const gifFrames = require('gif-frames');
 const MyBufferAccumulator = require('../WorkerHelpers/BufferAccumulator');
-
-const frames = new Array(50);
-// get our frames and store them.
-(async () => {
-  for (let i = 0; i < 50; i += 1) {
-    const accumulator = new MyBufferAccumulator();
-    const frame = await gifFrames({ url: './assets/images/america2.gif', frames: i });
-    frame[0].getImage().pipe(accumulator);
-    frames[i] = await accumulator.getBuffer();
-  }
-  console.log('okay done');
-})();
 const imageD = 256;
 
 
@@ -35,22 +22,32 @@ module.exports = {
       const encoder = new GIFEncoder(imageD, imageD, 'neuquant', true);
       encoder.createReadStream().pipe(myAccumulator);
       encoder.start();
-      encoder.setQuality(5);
-      encoder.setDelay(22);
+      encoder.setQuality(15);
+      encoder.setDelay(40);
+      encoder.setDispose(2);
 
       // get our canvas and buffer
       const canvas = createCanvas(imageD, imageD);
       const ctx = canvas.getContext('2d');
+      ctx.quality = 'fast';
+      ctx.patternQuality = 'fast';
 
-      for (let i = 0; i < 50; i += 1) {
+      // resize their image so we don't have to do it each time.
+      const ctxResize = canvas.getContext('2d');
+      ctxResize.drawImage(theirImage, 0, 0, imageD, imageD);
+      const buffer = canvas.toBuffer('image/jpeg', undefined);
+      theirImage.src = Buffer.from(buffer);
+
+      // loop over all images.
+      for (let i = 0; i < images.length - 1; i += 1) {
         ctx.globalAlpha = 1;
         const background = new Image();
-        background.src = Buffer.from(frames[i]);
+        background.src = Buffer.from(images[i]);
         ctx.drawImage(background, 0, 0);
 
         // get buffer and resize our image to our length
-        ctx.globalAlpha = 0.3;
-        ctx.drawImage(theirImage, 0, 0, imageD, imageD);
+        ctx.globalAlpha = 0.4;
+        ctx.drawImage(theirImage, 0, 0);
         encoder.addFrame(ctx);
       }
       encoder.finish();

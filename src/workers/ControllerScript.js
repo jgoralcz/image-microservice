@@ -387,7 +387,6 @@ process.on('message', async (message) => {
         break;
 
       case 'america':
-        console.log('made it');
         buffer = await america.execute(message.buffers, body.image_url);
         break;
 

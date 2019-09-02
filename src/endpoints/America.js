@@ -1,5 +1,6 @@
 module.exports = {
   name: 'america',
   args: ['image_url'],
-  filepaths: [],
+  filepaths: ['./assets/images/america2.gif'],
+  contentType: 'image/gif',
 };

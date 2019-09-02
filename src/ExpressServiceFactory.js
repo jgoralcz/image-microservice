@@ -1,5 +1,9 @@
 const fs = require('fs');
 const { fork } = require('child_process');
+const gifFrames = require('gif-frames');
+const MyBufferAccumulator = require('./workers/WorkerHelpers/BufferAccumulator');
+const util = require('util');
+const readdir = util.promisify(fs.readdir);
 
 
 /**
@@ -92,11 +96,11 @@ module.exports = {
    * @param app the express app
    * @param numThreads the number of worker threads.
    */
-  init(app, numThreads) {
+  async init(app, numThreads) {
     this.dir = `./src${this.endpoints}`;
     this.expressApp = app;
     this.maxThreads = numThreads;
-    this.createServicesAndWorkers();
+    await this.createServicesAndWorkers();
 
     // set interval
     this.interval = setInterval(() => {
@@ -130,7 +134,7 @@ module.exports = {
    * This is because Node-Canvas and Sharp use their own threading.
    * Additionally, it's up to the user if they want to add their own.
    */
-  createServicesAndWorkers() {
+  async createServicesAndWorkers() {
     // create new processes (worker threads in the future) based off their specification for the main script
     this.workerArray = new Array(this.maxThreads);
 
@@ -146,7 +150,8 @@ module.exports = {
     };
 
     // loop through files, sync so we can get it over with
-    fs.readdirSync(this.dir).forEach(async (file) => {
+    const files = await readdir(this.dir);
+    for ( const file of files) {
       // require the filepath then initialize the service.
       // eslint-disable-next-line import/no-dynamic-require,global-require
       const endpoint = require(`.${this.endpoints}${file}`);
@@ -154,11 +159,24 @@ module.exports = {
       // add buffer to our endpoint
       if (endpoint.filepaths != null) {
         endpoint.buffers = [];
+        // loop through our files.
         for (let i = 0; i < endpoint.filepaths.length; i += 1) {
-          const readFile = fs.readFileSync(endpoint.filepaths[i]);
-          endpoint.buffers.push(Buffer.from(readFile));
+          // read gifs special because they have more than 1 buffer.
+          if (endpoint.filepaths[i].endsWith('gif')) {
+            const frames = await gifFrames({url: endpoint.filepaths[i], frames: 'all'});
+            for (let f = 0; f < frames.length; f += 1) {
+              const accumulator = new MyBufferAccumulator();
+              frames[f].getImage().pipe(accumulator);
+              endpoint.buffers.push(await accumulator.getBuffer());
+            }
+            // otherwise read image normally.
+          } else {
+            const readFile = fs.readFileSync(endpoint.filepaths[i]);
+            endpoint.buffers.push(Buffer.from(readFile));
+          }
         }
       }
+
 
       // if we don't have an overriding initService, then let's use ours
       if (!endpoint.initService) {
@@ -166,29 +184,27 @@ module.exports = {
       } else {
         await endpoint.initService(endpoint, this.expressApp, serviceObj);
       }
-    });
+    }
   },
 
   /**
-     * init service and use the requested process function
-     * @param module the module to initialize
-     * @param workerMessageListener worker message listener
-     */
-  initService(module, workerMessageListener) {
+   * init service and use the requested process function
+   * @param module the module to initialize
+   */
+  initService(module) {
     // add the module nap to the express app
     this.expressApp.use(`/api/${module.name}`, (req, res) => {
-      this.expressLogic(req, res, module, workerMessageListener);
+      this.expressLogic(req, res, module);
     });
   },
 
   /**
-   * logic for the endpoint.
+   * basic logic for the endpoint.
    * @param req the request object.
    * @param res the response object.
    * @param module the module to work with.
-   * @param workerMessageListener the worker listener to override if one is provided.
    */
-  expressLogic(req, res, module, workerMessageListener) {
+  expressLogic(req, res, module) {
     // json body needed
     const { body } = req;
 

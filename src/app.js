@@ -16,13 +16,12 @@ if (!isNaN(parseInt(args[0], 10))) {
 }
 
 // start the factory with our app
-startFactory.init(app, threads);
-
-// use / to give message
-app.use('/', async (req, res) => {
-  res.contentType('application/json');
-  res.status(400);
-  res.send('Please use the correct endpoints. See the github repo for the endpoints and check in the /src/endpoints folder.');
+startFactory.init(app, threads).then(() => {
+  // use / to give message
+  app.use('/', async (req, res) => {
+    res.contentType('application/json');
+    res.status(400);
+    res.send('Please use the correct endpoints. See the github repo for the endpoints and check in the /src/endpoints folder.');
+  });
 });
-
 module.exports = app;
