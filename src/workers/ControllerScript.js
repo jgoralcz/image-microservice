@@ -390,11 +390,9 @@ process.on('message', async (message) => {
         break;
 
       case 'america':
-        buffer = await america.execute(message.buffers, body.image_url);
-        break;
-
       // don't tell anyone I'm using the america endpoint for this.
       case 'communism':
+      case 'japan':
         buffer = await america.execute(message.buffers, body.image_url);
         break;
 

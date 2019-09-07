@@ -1,6 +1,6 @@
 module.exports = {
-  name: 'weeb',
+  name: 'japan',
   args: ['image_url'],
-  filepaths: ['./assets/images/weeb.gif'],
+  filepaths: ['./assets/images/japan.gif'],
   contentType: 'image/gif',
 };

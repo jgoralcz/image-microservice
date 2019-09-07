@@ -19,11 +19,11 @@ module.exports = {
       // use gifencoder
       // create our new accumulator
       const myAccumulator = new MyBufferAccumulator();
-      const encoder = new GIFEncoder(imageD, imageD, 'octree', false);
+      const encoder = new GIFEncoder(imageD, imageD, 'neuquant', false);
       encoder.createReadStream().pipe(myAccumulator);
       encoder.start();
-      encoder.setQuality(30);
-      encoder.setDelay(90);
+      // encoder.setQuality(30);
+      // encoder.setDelay(90);
 
       // get our canvas and buffer
       const canvas = createCanvas(imageD, imageD);
@@ -36,7 +36,6 @@ module.exports = {
       theirImage.src = Buffer.from(buffer);
 
       // loop over all images.
-      console.log(images.length);
       for (let i = 0; i < images.length; i += 1) {
         ctx.globalAlpha = 1;
         const background = new Image();
@@ -44,8 +43,8 @@ module.exports = {
         ctx.drawImage(background, 0, 0);
 
         // get buffer and resize our image to our length
-        // ctx.globalAlpha = 0.4;
-        // ctx.drawImage(theirImage, 0, 0);
+        ctx.globalAlpha = 0.4;
+        ctx.drawImage(theirImage, 0, 0);
         encoder.addFrame(ctx);
       }
       encoder.finish();
