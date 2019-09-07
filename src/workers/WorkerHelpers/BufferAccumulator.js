@@ -22,4 +22,4 @@ module.exports = class MyBufferAccumulator extends Writable {
       this.once('error', (err) => rj(err));
     });
   }
-}
+};

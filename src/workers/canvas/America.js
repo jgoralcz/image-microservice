@@ -47,7 +47,7 @@ module.exports = {
         ctx.drawImage(background, 0, 0, imageD, imageD);
 
         // get buffer and resize our image to our length
-        ctx.globalAlpha = 0.4;
+        ctx.globalAlpha = 0.5;
         ctx.drawImage(theirImage, 0, 0, imageD, imageD);
         encoder.addFrame(ctx);
       }
