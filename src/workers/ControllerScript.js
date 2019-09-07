@@ -33,9 +33,11 @@ const jail = require('./canvas/Jail');
 const triggered = require('./canvas/Triggered');
 const america = require('./canvas/America');
 const weeb = require('./canvas/Weeb');
+const ping = require('./canvas/Ping');
 
 const homie = require('./jimp/Homie.js');
 
+// helpers
 const canvasHelper = require('./WorkerHelpers/CanvasHelper.js');
 const loadBuffer = require('./canvas/LoadBuffer.js');
 
@@ -400,6 +402,9 @@ process.on('message', async (message) => {
         buffer = await weeb.execute(message.buffers, body.image_url);
         break;
 
+      case 'ping':
+        buffer = await ping.execute(message.buffers, body.image_url);
+        break;
 
       default:
         buffer = undefined;
