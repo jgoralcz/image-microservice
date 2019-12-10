@@ -1,5 +1,6 @@
 // the main script to run most of your commands so the threads (actually processes for now)
 const halloweenify = require('./jimp/Halloweenify.js');
+const christmasify = require('./jimp/Christmasify.js');
 const blurpify = require('./jimp/Blurpify.js');
 const jpegify = require('./jimp/Jpegify.js');
 const ascii = require('./jimp/Ascii.js');
@@ -402,6 +403,10 @@ process.on('message', async (message) => {
 
       case 'ping':
         buffer = await ping.execute(message.buffers, body.image_url);
+        break;
+
+      case 'christmasify':
+        buffer = await christmasify.execute(body.image_url, parseInt(body.threshold || 0, 10));
         break;
 
       default:

@@ -3,6 +3,7 @@ const { fork } = require('child_process');
 const gifFrames = require('gif-frames');
 const MyBufferAccumulator = require('./workers/WorkerHelpers/BufferAccumulator');
 const util = require('util');
+
 const readdir = util.promisify(fs.readdir);
 
 
@@ -151,7 +152,7 @@ module.exports = {
 
     // loop through files, sync so we can get it over with
     const files = await readdir(this.dir);
-    for ( const file of files) {
+    for (const file of files) {
       // require the filepath then initialize the service.
       // eslint-disable-next-line import/no-dynamic-require,global-require
       const endpoint = require(`.${this.endpoints}${file}`);
