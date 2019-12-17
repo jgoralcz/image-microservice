@@ -17,6 +17,7 @@ module.exports = {
       }
 
       image.grayscale();
+
       image.brightness(-0.32);
       image.contrast(0.30);
 

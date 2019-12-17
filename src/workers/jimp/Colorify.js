@@ -13,9 +13,9 @@ module.exports = {
       // image.contrast(0.12);
       image.normalize();
       image.color([
-        { apply: 'red', params: [r] },
-        { apply: 'green', params: [g] },
-        { apply: 'blue', params: [g] },
+        { apply: 'red', params: [parseInt(r, 10)] },
+        { apply: 'green', params: [parseInt(g, 10)] },
+        { apply: 'blue', params: [parseInt(b, 10)] },
         // {apply: 'saturate', params: [3]},
         // {apply: 'mix', params: [90]}
       ]);
