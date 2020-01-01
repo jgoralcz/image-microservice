@@ -1,4 +1,4 @@
 module.exports = {
-  name: 'simplerick',
+  name: 'smartcrop',
   args: ['image_url', 'width', 'height', 'options'],
 };

@@ -32,7 +32,6 @@ const execute = async (url, width, height, userOptions) => {
   } catch (error) {
     return undefined;
   }
-
 };
 
 module.exports = execute;

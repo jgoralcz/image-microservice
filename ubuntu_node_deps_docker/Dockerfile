@@ -68,16 +68,6 @@ RUN mkdir -p ~/opencv cd ~/opencv && \
   make install && \ 
   ldconfig
 
-COPY package*.json ./
-
-RUN npm install git+https://git@github.com/jgoralcz/node-opencv.git --force \
-  && npm install sharp && npm install --save smartcrop-sharp \
-  && npm install canvas && npm install gif-encoder-2 && \
-  npm install gifencoder && npm install gif-frames
-
-# EXPOSE 9002
-# CMD ["node", "./src/server.js", "10"]
-
-# docker commit mims mims_deps
+CMD ["/bin/bash"]
 
 
