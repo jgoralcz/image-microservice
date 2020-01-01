@@ -45,6 +45,7 @@ const loadBuffer = require('./canvas/LoadBuffer.js');
 // sharp
 const sharpen = require('./sharp/Sharpen.js');
 const blur = require('./sharp/Blur.js');
+const smartcrop = require('./sharp/smartcrop');
 
 
 // check that the sorter was called as a worker thread
@@ -407,6 +408,10 @@ process.on('message', async (message) => {
 
       case 'colorify':
         buffer = await colorify.execute(body.image_url, parseInt(body.threshold || 0, 10), body.r, body.g, body.b);
+        break;
+
+      case 'smartcrop':
+        buffer = await smartcrop(body.image_url, body.width, body.height, body.options);
         break;
 
       default:
