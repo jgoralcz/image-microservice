@@ -30,11 +30,14 @@ const promiseGMBufferFirstFrame = (buffer, frame = 0) => new Promise((resolve, r
 
 const promiseGM = (buffer, crop, width, height) => new Promise((resolve, reject) => {
   gm(buffer)
-    .gravity('Center')
     .crop(crop.width, crop.height, crop.x, crop.y)
+    .gravity('Center')
     .resize(width * 2, height * 2)
-    .resize(null, height * 2)
-    .crop(width * 2, height * 2)
+    .resize(null, height)
+    .crop(width, height)
+    .borderColor('white')
+    .border(2, 2)
+    .gravity('West')
     .toBuffer((err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
