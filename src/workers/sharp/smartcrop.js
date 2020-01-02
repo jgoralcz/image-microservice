@@ -30,8 +30,11 @@ const promiseGMBufferFirstFrame = (buffer, frame = 0) => new Promise((resolve, r
 
 const promiseGM = (buffer, crop, width, height) => new Promise((resolve, reject) => {
   gm(buffer)
-    .crop(width, height, crop.x, crop.y)
-    // .resize(width, height, '!')
+    .gravity('Center')
+    .crop(crop.width, crop.height, crop.x, crop.y)
+    .resize(width * 2, height * 2)
+    .resize(null, height * 2)
+    .crop(width * 2, height * 2)
     .toBuffer((err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
@@ -40,7 +43,6 @@ const promiseGM = (buffer, crop, width, height) => new Promise((resolve, reject)
 
 const execute = async (url, width, height, userOptions) => {
   const { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
-  console.log(buffer);
   if (!buffer) return undefined;
 
   const firstFrameBuffer = await promiseGMBufferFirstFrame(buffer);
@@ -48,15 +50,11 @@ const execute = async (url, width, height, userOptions) => {
   if (!firstFrameBuffer || !firstFrameBuffer.toString) return undefined;
   const reduceQualityBuffer = (firstFrameBuffer.toString().length > 30000) ? await sharp(firstFrameBuffer).jpeg({ quality: 10 }).toBuffer() : firstFrameBuffer;
 
-  const options = await faceDetect(reduceQualityBuffer, userOptions).catch(() => null) || [{ width, height }];
+  let options = await faceDetect(reduceQualityBuffer, userOptions).catch(() => null);
+  if (!options || options.length <= 0) options = [{ width, height }];
+
   const { topCrop: crop } = await smartcrop.crop(buffer, options);
-  return sharp(firstFrameBuffer)
-    .extract({ width: crop.width, height: crop.height, left: crop.x, top: crop.y })
-    .resize(width, height)
-    .toBuffer();
-  // console.log(crop);
-  // console.log(width, height);
-  // return promiseGM(buffer, crop, width, height);
+  return promiseGM(buffer, crop, width, height);
 };
 
 
