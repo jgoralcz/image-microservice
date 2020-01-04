@@ -9,8 +9,9 @@ RUN apt-get -y install nodejs
 
 # node canvas
 RUN apt-get update && apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++
-# graphicsmagick (jimp)
-RUN apt-get update -y && apt-get install -y graphicsmagick graphicsmagick-imagemagick-compat
+
+# graphicsmagick imagemagick
+RUN apt-get update -y && apt-get install -y graphicsmagick graphicsmagick-imagemagick-compat imagemagick
 RUN apt-get clean
 
 # the following is taken from: https://github.com/lovell/sharp/issues/955
