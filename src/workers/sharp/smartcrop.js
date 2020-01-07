@@ -147,6 +147,26 @@ const execute = async (url, width, height, userOptions) => {
     return promiseGM(buffer, crop, width, height, true);
   }
 
+  if (ratio > 1.3) {
+    const sharpBuffer = await sharp(buffer)
+      .extract({ width: crop.width, height: crop.height, left: crop.x, top: crop.y })
+      .resize(width, height)
+      .toBuffer();
+    return new Promise((resolve, reject) => {
+      gm(sharpBuffer)
+        .quality(88)
+        .background('#ffffff')
+        .extent(221, 346)
+        .borderColor('white')
+        .border(2, 2)
+        .flatten()
+        .toBuffer('jpg', (err, buf) => {
+          if (err) return reject(err);
+          return resolve(buf);
+        });
+    });
+  }
+
   return promiseGM(buffer, crop, width, height);
 };
 
