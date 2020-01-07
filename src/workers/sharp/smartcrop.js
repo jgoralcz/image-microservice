@@ -35,22 +35,22 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
   if (gif) {
     return im(buffer)
       .coalesce()
-      .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
-      // .gravity('Center')
+      .crop(crop.width, crop.height, crop.x, crop.y)
       .resize(width * 2, height * 2)
       .resize(null, height)
-      .crop(width, height, 0, 0)
-      .trim()
-      // .crop(width, height - 4, 0, 2)
+      .crop(width, height - 4, -50, 2)
+      // .resize(width, height)
       .background('#ffffff')
       .borderColor('white')
       .border(2, 2)
+      .extent(width, height)
       .toBuffer((err, buf) => {
         if (err) return reject(err);
         return resolve(buf);
       });
   }
   return gm(buffer)
+    .quality(88)
     .gravity('Center')
     .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
     .resize(width * 2, height * 2)
@@ -69,15 +69,21 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
 });
 
 const execute = async (url, width, height, userOptions) => {
-  let { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
+  const { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
   if (!buffer) return undefined;
 
   const metadata = await sharp(buffer).metadata();
 
-  if (metadata.width === 225 && metadata.height === 350) {
+  const roundedRatio = Math.floor((metadata.width / metadata.height) * 100) / 100;
+
+  if (roundedRatio === 0.63 || roundedRatio === 0.64 || roundedRatio === 0.65) {
     return new Promise((resolve, reject) => {
       gm(buffer)
         .background('#ffffff')
+        .quality(88)
+        .resize(225, 350)
+        .crop(225, 350, 0, 0)
+        .gravity('Center')
         .extent(221, 346)
         .borderColor('white')
         .border(2, 2)
@@ -94,7 +100,7 @@ const execute = async (url, width, height, userOptions) => {
   if (ratio <= 0.56) {
     return new Promise((resolve, reject) => {
       gm(buffer)
-        .coalesce()
+        .quality(88)
         .resize(225, metadata.height * (225 / metadata.width), '!')
         .crop(221, 346, 0, 0)
         .background('#ffffff')
@@ -111,7 +117,7 @@ const execute = async (url, width, height, userOptions) => {
   if (ratio <= 0.64) {
     return new Promise((resolve, reject) => {
       gm(buffer)
-        .coalesce()
+        .quality(88)
         .gravity('Center')
         .resize(225, metadata.height * (225 / metadata.width), '!')
         .crop(221, 346, 0, 0)
@@ -139,26 +145,6 @@ const execute = async (url, width, height, userOptions) => {
 
   if (isGif(buffer)) {
     return promiseGM(buffer, crop, width, height, true);
-  }
-
-  // ratio weird with gm
-  if ((metadata.width / metadata.height) > 1) {
-    const sharpBuffer = await sharp(buffer)
-      .extract({ width: crop.width, height: crop.height, left: crop.x, top: crop.y })
-      .resize(width, height)
-      .toBuffer();
-    return new Promise((resolve, reject) => {
-      gm(sharpBuffer)
-        .background('#ffffff')
-        .extent(221, 346)
-        .borderColor('white')
-        .border(2, 2)
-        .flatten()
-        .toBuffer('jpg', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
   }
 
   return promiseGM(buffer, crop, width, height);
