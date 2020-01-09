@@ -47,6 +47,9 @@ const sharpen = require('./sharp/Sharpen.js');
 const blur = require('./sharp/Blur.js');
 const smartcrop = require('./sharp/smartcrop');
 
+// gm
+const magik = require('./gm/Magik');
+
 
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
@@ -412,6 +415,10 @@ process.on('message', async (message) => {
 
       case 'smartcrop':
         buffer = await smartcrop(body.image_url, body.width, body.height, body.options);
+        break;
+
+      case 'magik':
+        buffer = await magik(body.image_url);
         break;
 
       default:
