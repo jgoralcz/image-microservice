@@ -36,6 +36,7 @@ const promiseGM = (buffer, crop, width, height, multiplier, gif) => new Promise(
     return im(buffer)
       .coalesce()
       .gravity('Center')
+      .sharpen(2, 1)
       .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
       .resize(225 * 2, 350 * 2)
       .resize(null, 350)
@@ -49,8 +50,9 @@ const promiseGM = (buffer, crop, width, height, multiplier, gif) => new Promise(
       });
   }
   return gm(buffer)
-    .quality(80)
+    .quality(92)
     .gravity('Center')
+    .sharpen(2, 1)
     .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
     .resize(width * 2, height * 2)
     .resize(null, height)
@@ -72,16 +74,17 @@ const execute = async (url, width, height, userOptions) => {
   if (!buffer) return undefined;
 
   const metadata = await sharp(buffer).metadata();
-
   const roundedRatio = Math.floor((metadata.width / metadata.height) * 100) / 100;
 
-  const multiplier = (width > 225 && height > 350) ? 1 : 0.5;
+  // const multiplier = (width > 225 && height > 350) ? 1 : 0.5;
+  const multiplier = 0.5;
 
   if ((roundedRatio === 0.63 || roundedRatio === 0.64 || roundedRatio === 0.65) && !isGif(buffer)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
         .background('#ffffff')
-        .quality(80)
+        .quality(92)
+        .sharpen(2, 1)
         .resize(width, height)
         .crop(width, height, 0, 0)
         .gravity('Center')
@@ -97,11 +100,11 @@ const execute = async (url, width, height, userOptions) => {
   }
 
   // another weird ratio hard to get image sometimes.
-  const ratio = metadata.width / metadata.height;
-  if (ratio <= 0.56 && !isGif(buffer)) {
+  if (roundedRatio <= 0.56 && !isGif(buffer)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
-        .quality(80)
+        .quality(92)
+        .sharpen(2, 1)
         .resize(width, metadata.height * (width / metadata.width), '!')
         .crop(width - 4 * multiplier, height - 4 * multiplier, 0, 0)
         .background('#ffffff')
@@ -115,13 +118,14 @@ const execute = async (url, width, height, userOptions) => {
         });
     });
   }
-  if (ratio <= 0.64) {
+  if (roundedRatio <= 0.64) {
     return new Promise((resolve, reject) => {
       gm(buffer)
-        .quality(80)
+        .quality(92)
+        .sharpen(2, 1)
         .gravity('Center')
         .resize(width, metadata.height * (width / metadata.width), '!')
-        .crop(width - 4 * multiplier, width - 4 * multiplier, 0, 0)
+        .crop(width - 4 * multiplier, height - 4 * multiplier, 0, 0)
         .background('#ffffff')
         .extent(width - 4 * multiplier, height - 4 * multiplier)
         .borderColor('white')
@@ -148,25 +152,26 @@ const execute = async (url, width, height, userOptions) => {
     return promiseGM(buffer, crop, width, height, multiplier, true);
   }
 
-  // if (ratio > 1.3) {
-  //   const sharpBuffer = await sharp(buffer)
-  //     .extract({ width: crop.width, height: crop.height, left: crop.x, top: crop.y })
-  //     .resize(width, height)
-  //     .toBuffer();
-  //   return new Promise((resolve, reject) => {
-  //     gm(sharpBuffer)
-  //       .quality(85)
-  //       .background('#ffffff')
-  //       .extent(width - 4 * multiplier, height - 4 * multiplier)
-  //       .borderColor('white')
-  //       .border(2 * multiplier, 2 * multiplier)
-  //       .flatten()
-  //       .toBuffer('jpg', (err, buf) => {
-  //         if (err) return reject(err);
-  //         return resolve(buf);
-  //       });
-  //   });
-  // }
+  if (roundedRatio > 1.7) {
+    const sharpBuffer = await sharp(buffer)
+      .extract({ width: crop.width, height: crop.height, left: crop.x, top: crop.y })
+      .resize(width, height)
+      .toBuffer();
+    return new Promise((resolve, reject) => {
+      gm(sharpBuffer)
+        .quality(92)
+        .sharpen(2, 1)
+        .background('#ffffff')
+        .extent(width - 4 * multiplier, height - 4 * multiplier)
+        .borderColor('white')
+        .border(2 * multiplier, 2 * multiplier)
+        .flatten()
+        .toBuffer('jpg', (err, buf) => {
+          if (err) return reject(err);
+          return resolve(buf);
+        });
+    });
+  }
 
   return promiseGM(buffer, crop, width, height, multiplier);
 };
