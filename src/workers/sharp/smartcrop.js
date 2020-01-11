@@ -92,7 +92,7 @@ const execute = async (url, width, height, userOptions) => {
   const metadata = await sharp(buffer).metadata();
   const roundedRatio = Math.floor((metadata.width / metadata.height) * 100) / 100;
 
-  if ((roundedRatio === 0.63 || roundedRatio === 0.64 || roundedRatio === 0.65) && !isImageType(buffer, MAGIC.gifNumber)) {
+  if ((roundedRatio === 0.63 || roundedRatio === 0.64) && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
         .background('#ffffff')
