@@ -66,8 +66,8 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
     .resize(null, height)
     .crop(width, height, 0)
     .crop(width + 100, height, -50, 0)
+    .extent(width, height)
     .background('#ffffff')
-    // .extent(width, height)
     .flatten()
     .toBuffer('jpg', (err, buf) => {
       if (err) return reject(err);
@@ -92,25 +92,6 @@ const execute = async (url, width, height, userOptions) => {
   const metadata = await sharp(buffer).metadata();
   const roundedRatio = Math.floor((metadata.width / metadata.height) * 100) / 100;
 
-  if (roundedRatio === 0.64 && !isImageType(buffer, MAGIC.gifNumber)) {
-    return new Promise((resolve, reject) => {
-      gm(buffer)
-        .background('#ffffff')
-        .quality(92)
-        .sharpen(1.5, 1)
-        .resize(width, height)
-        .crop(width, height, 0, 0)
-        .gravity('Center')
-        .extent(width, height)
-        .flatten()
-        .toBuffer(isImageType(buffer, MAGIC.gifNumber) ? 'gif' : 'jpg', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
-  }
-
-  // another weird ratio hard to get image sometimes.
   if (roundedRatio <= 0.56 && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
@@ -127,7 +108,7 @@ const execute = async (url, width, height, userOptions) => {
         });
     });
   }
-  if (roundedRatio <= 0.64 && !isImageType(buffer, MAGIC.gifNumber)) {
+  if (roundedRatio < 0.64 && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
         .quality(92)
@@ -135,8 +116,8 @@ const execute = async (url, width, height, userOptions) => {
         .gravity('Center')
         .resize(width, metadata.height * (width / metadata.width), '!')
         .crop(width, height, 0, 0)
-        .background('#ffffff')
         .extent(width, height)
+        .background('#ffffff')
         .flatten()
         .toBuffer(isImageType(buffer, MAGIC.gifNumber) ? 'gif' : 'jpg', (err, buf) => {
           if (err) return reject(err);
