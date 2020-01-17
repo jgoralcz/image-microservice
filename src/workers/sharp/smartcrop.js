@@ -59,11 +59,11 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
   }
   return gm(buffer)
     .quality(93)
-    .gravity('Center')
     .sharpen(1.5, 1)
     .crop(crop.width, crop.height, crop.x, crop.y)
     .resize(width * 2, height * 2)
     .resize(null, height)
+    .gravity('Center')
     .crop(width, height, 0)
     .crop(width + 100, height, -50, 0)
     .extent(width, height)
@@ -92,7 +92,7 @@ const execute = async (url, width, height, userOptions) => {
   const metadata = await sharp(buffer).metadata();
   const roundedRatio = Math.floor((metadata.width / metadata.height) * 100) / 100;
 
-  if (roundedRatio <= 0.56 && !isImageType(buffer, MAGIC.gifNumber)) {
+  if (roundedRatio < 0.64 && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
         .quality(93)
