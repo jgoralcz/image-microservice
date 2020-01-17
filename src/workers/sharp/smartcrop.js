@@ -108,10 +108,10 @@ const execute = async (url, width, height, userOptions) => {
         });
     });
   }
-  if (roundedRatio < 0.69 && !isImageType(buffer, MAGIC.gifNumber)) {
+  if (roundedRatio < 0.90 && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
-        .quality(92)
+        .quality(93)
         .sharpen(1.5, 1)
         .gravity('Center')
         .resize(width, metadata.height * (width / metadata.width), '!')
