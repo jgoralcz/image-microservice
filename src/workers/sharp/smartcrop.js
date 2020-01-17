@@ -58,7 +58,7 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
       });
   }
   return gm(buffer)
-    .quality(92)
+    .quality(93)
     .gravity('Center')
     .sharpen(1.5, 1)
     .crop(crop.width, crop.height, crop.x, crop.y)
@@ -95,7 +95,7 @@ const execute = async (url, width, height, userOptions) => {
   if (roundedRatio <= 0.56 && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
-        .quality(92)
+        .quality(93)
         .sharpen(1.5, 1)
         .resize(width, metadata.height * (width / metadata.width), '!')
         .crop(width, height, 0, 0)
