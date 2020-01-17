@@ -61,7 +61,7 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
     .quality(92)
     .gravity('Center')
     .sharpen(1.5, 1)
-    .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
+    .crop(crop.width, crop.height, crop.x, crop.y)
     .resize(width * 2, height * 2)
     .resize(null, height)
     .crop(width, height, 0)
@@ -108,13 +108,14 @@ const execute = async (url, width, height, userOptions) => {
         });
     });
   }
-  if (roundedRatio < 0.64 && !isImageType(buffer, MAGIC.gifNumber)) {
+  if (roundedRatio < 0.69 && !isImageType(buffer, MAGIC.gifNumber)) {
     return new Promise((resolve, reject) => {
       gm(buffer)
         .quality(92)
         .sharpen(1.5, 1)
         .gravity('Center')
         .resize(width, metadata.height * (width / metadata.width), '!')
+        .resize(null, height)
         .crop(width, height, 0, 0)
         .extent(width, height)
         .background('#ffffff')
@@ -138,25 +139,6 @@ const execute = async (url, width, height, userOptions) => {
 
   if (isImageType(buffer, MAGIC.gifNumber)) {
     return promiseGM(buffer, crop, width, height, true);
-  }
-
-  if (roundedRatio > 1.7) {
-    const sharpBuffer = await sharp(buffer)
-      .extract({ width: crop.width, height: crop.height, left: crop.x, top: crop.y })
-      .resize(width, height)
-      .toBuffer();
-    return new Promise((resolve, reject) => {
-      gm(sharpBuffer)
-        .quality(92)
-        .sharpen(1.5, 1)
-        .background('#ffffff')
-        .extent(width, height)
-        .flatten()
-        .toBuffer('jpg', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
   }
 
   return promiseGM(buffer, crop, width, height);
