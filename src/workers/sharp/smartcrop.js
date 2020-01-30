@@ -49,7 +49,6 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
       .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
       .resize(225 * 2, 350 * 2)
       .resize(null, 350)
-      .borderColor('white')
       .extent(225, 350)
       .repage('+')
       .toBuffer((err, buf) => {
@@ -58,15 +57,10 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
       });
   }
   return gm(buffer)
-    .quality(93)
+    .quality(92)
     .sharpen(1.5, 1)
     .crop(crop.width, crop.height, crop.x, crop.y)
-    .resize(width * 2, height * 2)
-    .resize(null, height)
-    .gravity('Center')
-    .crop(width, height, 0)
-    .crop(width + 100, height, -50, 0)
-    .extent(width, height)
+    .resize(width, height, '!')
     .background('#ffffff')
     .flatten()
     .toBuffer('jpg', (err, buf) => {
@@ -89,58 +83,18 @@ const execute = async (url, width, height, userOptions) => {
     });
   }
 
-  const metadata = await sharp(buffer).metadata();
-  const roundedRatio = Math.floor((metadata.width / metadata.height) * 100) / 100;
-
-  if (roundedRatio < 0.64 && !isImageType(buffer, MAGIC.gifNumber)) {
-    return new Promise((resolve, reject) => {
-      gm(buffer)
-        .quality(93)
-        .sharpen(1.5, 1)
-        .resize(width, metadata.height * (width / metadata.width), '!')
-        .crop(width, height, 0, 0)
-        .background('#ffffff')
-        .extent(width, height)
-        .flatten()
-        .toBuffer(isImageType(buffer, MAGIC.gifNumber) ? 'gif' : 'jpg', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
-  }
-  if (roundedRatio < 0.90 && !isImageType(buffer, MAGIC.gifNumber)) {
-    return new Promise((resolve, reject) => {
-      gm(buffer)
-        .quality(93)
-        .sharpen(1.5, 1)
-        .gravity('Center')
-        .resize(width, metadata.height * (width / metadata.width), '!')
-        .resize(null, height)
-        .crop(width, height, 0, 0)
-        .extent(width, height)
-        .background('#ffffff')
-        .flatten()
-        .toBuffer(isImageType(buffer, MAGIC.gifNumber) ? 'gif' : 'jpg', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
-  }
-
   const firstFrameBuffer = await promiseGMBufferFirstFrame(buffer);
-
   if (!firstFrameBuffer || !firstFrameBuffer.toString) return undefined;
 
   const reduceQualityBuffer = (firstFrameBuffer.toString().length > 10000) ? await sharp(firstFrameBuffer).jpeg({ quality: 40 }).toBuffer() : firstFrameBuffer;
 
-  const options = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
+  const boost = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 
-  const { topCrop: crop } = await smartcrop.crop(buffer, options);
+  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost, ruleOfThirds: true, minScale: 1.0 });
 
   if (isImageType(buffer, MAGIC.gifNumber)) {
     return promiseGM(buffer, crop, width, height, true);
   }
-
   return promiseGM(buffer, crop, width, height);
 };
 

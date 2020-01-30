@@ -3,7 +3,7 @@ FROM joshgor01/ubuntu_node_opencv:latest
 COPY package*.json ./
 
 RUN npm install git+https://git@github.com/jgoralcz/node-opencv.git --force
-RUN npm install sharp
+RUN npm install sharp && npm install smartcrop-sharp
 RUN npm install canvas && npm install gif-encoder-2
 RUN npm install gifencoder
 RUN npm install gif-frames
