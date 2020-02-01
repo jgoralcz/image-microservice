@@ -10,7 +10,10 @@ RUN apt-get -y install nodejs
 # node canvas
 RUN apt-get update && apt-get install -y libcairo2-dev libjpeg-dev libpango1.0-dev libgif-dev build-essential g++
 
-# graphicsmagick
+# webp support graphicsmagick
+RUN apt install software-properties-common -y
+RUN add-apt-repository ppa:rwky/graphicsmagick -y && apt-get update -y && apt-get install graphicsmagick -y 
+RUN apt-get install libgraphicsmagick3 -y
 RUN apt-get update -y && apt-get install -y graphicsmagick graphicsmagick-imagemagick-compat
 
 # imagemagick

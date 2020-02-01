@@ -3,7 +3,6 @@ const cv = require('opencv');
 const im = require('gm').subClass({ imageMagick: true });
 const gm = require('gm');
 const smartcrop = require('smartcrop-gm');
-const sharp = require('sharp');
 
 const MAGIC = Object.freeze({
   jpgNumber: 'ffd8ffe0',
@@ -12,6 +11,7 @@ const MAGIC = Object.freeze({
   gifNumber: '47494638',
   jpgGeneral: 'ffd8ff',
   webm: '1f45dfa3',
+  webp: '52494646',
 });
 
 const isImageType = (buffer, type = MAGIC.gifNumber) => buffer.toString('hex', 0, 4) === type;
@@ -33,8 +33,8 @@ const faceDetect = (input, userOptions) => new Promise((resolve, reject) => {
   });
 });
 
-const promiseGMBufferFirstFrame = (buffer, frame = 0) => new Promise((resolve, reject) => {
-  gm(buffer).selectFrame(frame).toBuffer((err, buf) => {
+const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject) => {
+  gm(buffer).selectFrame(frame).toBuffer('jpg', (err, buf) => {
     if (err) return reject(err);
     return resolve(buf);
   });
@@ -76,21 +76,29 @@ const execute = async (url, width, height, userOptions) => {
   if (isImageType(buffer, MAGIC.pngNumber)) {
     buffer = await new Promise((resolve, reject) => {
       gm(buffer).trim()
-        .toBuffer('png', (err, buf) => {
+        .toBuffer('jpg', (err, buf) => {
           if (err) return reject(err);
           return resolve(buf);
         });
     });
   }
 
-  const firstFrameBuffer = await promiseGMBufferFirstFrame(buffer);
+  const firstFrameBuffer = await promiseGMBufferFrame(buffer, 0);
   if (!firstFrameBuffer || !firstFrameBuffer.toString) return undefined;
 
-  const reduceQualityBuffer = (firstFrameBuffer.toString().length > 10000) ? await sharp(firstFrameBuffer).jpeg({ quality: 40 }).toBuffer() : firstFrameBuffer;
-
+  const reduceQualityBuffer = (firstFrameBuffer.toString().length > 10000)
+    ? await new Promise((resolve, reject) => {
+      gm(buffer)
+        .quality(40)
+        .toBuffer('jpg', (err, buf) => {
+          if (err) return reject(err);
+          return resolve(buf);
+        });
+    })
+    : firstFrameBuffer;
   const boost = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 
-  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost, ruleOfThirds: true, minScale: 1.0 });
+  const { topCrop: crop } = await smartcrop.crop(reduceQualityBuffer, { width, height, boost, ruleOfThirds: true, minScale: 1.0 });
 
   if (isImageType(buffer, MAGIC.gifNumber)) {
     return promiseGM(buffer, crop, width, height, true);
