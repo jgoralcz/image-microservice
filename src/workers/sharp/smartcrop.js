@@ -42,12 +42,18 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
 
 const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((resolve, reject) => {
   if (gif) {
-    return im(buffer)
+    const bufferIM = im(buffer)
       .coalesce()
       .gravity('Center')
-      .sharpen(1.5, 1)
-      .crop(crop.width * 2, crop.height * 2, crop.x, crop.y)
-      .resize(225 * 2, 350 * 2)
+      .sharpen(1.5, 1);
+
+    if (boost && boost.length <= 0 && crop && crop.score && crop.score.saturation < 10 && (crop.score.detail < 5 || crop.score.saturation < -2 || crop.score.skin < 0)) {
+      bufferIM.crop(width, height, 0, 0);
+    } else {
+      bufferIM.crop(crop.width * 2, crop.height * 2, crop.x, crop.y);
+    }
+
+    bufferIM.resize(225 * 2, 350 * 2)
       .resize(null, 350)
       .extent(225, 350)
       .repage('+')
@@ -55,10 +61,11 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
         if (err) return reject(err);
         return resolve(buf);
       });
+    return bufferIM;
   }
 
   const bufferGM = gm(buffer);
-  if (boost && boost.length <= 0 && crop && crop.score && crop.score.skin < 8 && crop.score.detail < 5 && crop.score.saturation < 0) {
+  if (boost && boost.length <= 0 && crop && crop.score && crop.score.skin < 8 && crop.score.detail < 5 && (crop.score.saturation < -2 || crop.score.skin < -1 || crop.score.detail < -50)) {
     bufferGM.gravity('Center');
   }
   bufferGM.crop(crop.width, crop.height, crop.x, crop.y)
