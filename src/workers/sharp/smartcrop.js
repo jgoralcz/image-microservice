@@ -40,7 +40,7 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
   });
 });
 
-const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, reject) => {
+const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((resolve, reject) => {
   if (gif) {
     return im(buffer)
       .coalesce()
@@ -56,18 +56,43 @@ const promiseGM = (buffer, crop, width, height, gif) => new Promise((resolve, re
         return resolve(buf);
       });
   }
-  return gm(buffer)
-    .quality(92)
-    .sharpen(1.5, 1)
-    .crop(crop.width, crop.height, crop.x, crop.y)
+
+  const bufferGM = gm(buffer);
+  if (boost && boost.length <= 0 && crop && crop.score && crop.score.skin < 8 && crop.score.detail < 5) {
+    bufferGM.gravity('Center');
+  }
+  bufferGM.crop(crop.width, crop.height, crop.x, crop.y)
     .resize(width, height, '!')
-    .background('#ffffff')
     .flatten()
+    .sharpen(1.5, 1)
+    .background('#ffffff')
+    .quality(94)
     .toBuffer('jpg', (err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
     });
+
+  return bufferGM;
 });
+
+const getBoost = async (buffer, frameNum = 0, userOptions) => {
+  const frameBuffer = await promiseGMBufferFrame(buffer, frameNum);
+  if (!frameBuffer || !frameBuffer.toString) return undefined;
+
+  const reduceQualityBuffer = (frameBuffer.toString().length > 10000)
+    ? await new Promise((resolve, reject) => {
+      gm(buffer)
+        .quality(75)
+        .toBuffer('jpg', (err, buf) => {
+          if (err) return reject(err);
+          return resolve(buf);
+        });
+    })
+    : frameBuffer;
+
+  const boost = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
+  return boost;
+};
 
 const execute = async (url, width, height, userOptions) => {
   let { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
@@ -75,7 +100,11 @@ const execute = async (url, width, height, userOptions) => {
 
   if (isImageType(buffer, MAGIC.pngNumber)) {
     buffer = await new Promise((resolve, reject) => {
-      gm(buffer).trim()
+      im(buffer)
+        .flatten()
+        .fuzz(1, true)
+        .trim()
+        .repage('+')
         .toBuffer((err, buf) => {
           if (err) return reject(err);
           return resolve(buf);
@@ -83,28 +112,16 @@ const execute = async (url, width, height, userOptions) => {
     });
   }
 
-  const firstFrameBuffer = await promiseGMBufferFrame(buffer, 0);
-  if (!firstFrameBuffer || !firstFrameBuffer.toString) return undefined;
-
-  const reduceQualityBuffer = (firstFrameBuffer.toString().length > 10000)
-    ? await new Promise((resolve, reject) => {
-      gm(buffer)
-        .quality(40)
-        .toBuffer('jpg', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    })
-    : firstFrameBuffer;
-  const boost = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
-
-  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost, minScale: 1.0 });
-
-  if (isImageType(buffer, MAGIC.gifNumber)) {
-    return promiseGM(buffer, crop, width, height, true);
+  let boost = await getBoost(buffer, 0, userOptions);
+  if ((!boost || boost.length <= 0) && isImageType(buffer, MAGIC.gifNumber)) {
+    boost = await getBoost(buffer, 1, userOptions);
   }
-  return promiseGM(buffer, crop, width, height);
-};
 
+  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost, ruleOfThirds: true, minScale: 1.0 });
+  if (isImageType(buffer, MAGIC.gifNumber)) {
+    return promiseGM(buffer, crop, width, height, true, boost);
+  }
+  return promiseGM(buffer, crop, width, height, false, boost);
+};
 
 module.exports = execute;
