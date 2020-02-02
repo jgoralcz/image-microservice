@@ -65,7 +65,7 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
   }
 
   const bufferGM = gm(buffer);
-  if (boost && boost.length <= 0 && crop && crop.score && crop.score.skin < 8 && crop.score.detail < 5 && (crop.score.saturation < -2 || crop.score.skin < -1 || crop.score.detail < -50)) {
+  if (boost && boost.length <= 0 && crop && crop.score && crop.score.skin < 8 && crop.score.detail < 5 && (crop.score.saturation < -2 || crop.score.skin < -1 || crop.score.detail < -24)) {
     bufferGM.gravity('Center');
   }
   bufferGM.crop(crop.width, crop.height, crop.x, crop.y)
