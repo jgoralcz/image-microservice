@@ -76,7 +76,7 @@ const execute = async (url, width, height, userOptions) => {
   if (isImageType(buffer, MAGIC.pngNumber)) {
     buffer = await new Promise((resolve, reject) => {
       gm(buffer).trim()
-        .toBuffer('jpg', (err, buf) => {
+        .toBuffer((err, buf) => {
           if (err) return reject(err);
           return resolve(buf);
         });
@@ -98,7 +98,7 @@ const execute = async (url, width, height, userOptions) => {
     : firstFrameBuffer;
   const boost = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 
-  const { topCrop: crop } = await smartcrop.crop(reduceQualityBuffer, { width, height, boost, ruleOfThirds: true, minScale: 1.0 });
+  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost, minScale: 1.0 });
 
   if (isImageType(buffer, MAGIC.gifNumber)) {
     return promiseGM(buffer, crop, width, height, true);
