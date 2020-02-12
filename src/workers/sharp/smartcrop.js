@@ -47,11 +47,11 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
       .gravity('Center')
       .sharpen(1.5, 1);
 
-    if (boost && boost.length <= 0 && crop && crop.score && crop.score.saturation < 10 && (crop.score.detail < 5 || crop.score.saturation < -2 || crop.score.skin < 0)) {
-      bufferIM.crop(width, height, 0, 0);
-    } else {
-      bufferIM.crop(crop.width * 2, crop.height * 2, crop.x, crop.y);
-    }
+    // if (boost && boost.length <= 0 && crop && crop.score && crop.score.saturation < 10 && (crop.score.detail < 5 || crop.score.saturation < -2 || crop.score.skin < 0)) {
+    //   bufferIM.crop(width, height, 0, 0);
+    // } else {
+    //   bufferIM.crop(crop.width * 2, crop.height * 2, crop.x, crop.y);
+    // }
 
     bufferIM.resize(225 * 2, 350 * 2)
       .resize(null, 350)
@@ -124,7 +124,7 @@ const execute = async (url, width, height, userOptions) => {
     boost = await getBoost(buffer, 1, userOptions);
   }
 
-  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost, ruleOfThirds: true, minScale: 1.0 });
+  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost });
   if (isImageType(buffer, MAGIC.gifNumber)) {
     return promiseGM(buffer, crop, width, height, true, boost);
   }
