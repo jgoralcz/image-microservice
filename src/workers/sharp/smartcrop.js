@@ -44,8 +44,7 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
   if (gif) {
     const bufferIM = im(buffer)
       .coalesce()
-      .gravity('Center')
-      .sharpen(1.5, 1);
+      .gravity('Center');
 
     // if (boost && boost.length <= 0 && crop && crop.score && crop.score.saturation < 10 && (crop.score.detail < 5 || crop.score.saturation < -2 || crop.score.skin < 0)) {
     //   bufferIM.crop(width, height, 0, 0);
@@ -71,9 +70,8 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
   bufferGM.crop(crop.width, crop.height, crop.x, crop.y)
     .resize(width, height, '!')
     .flatten()
-    .sharpen(1.5, 1)
     .background('#ffffff')
-    .quality(94)
+    .quality(95)
     .toBuffer('jpg', (err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
