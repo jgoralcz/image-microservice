@@ -44,15 +44,8 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
   if (gif) {
     const bufferIM = im(buffer)
       .coalesce()
-      .gravity('Center');
-
-    // if (boost && boost.length <= 0 && crop && crop.score && crop.score.saturation < 10 && (crop.score.detail < 5 || crop.score.saturation < -2 || crop.score.skin < 0)) {
-    //   bufferIM.crop(width, height, 0, 0);
-    // } else {
-    //   bufferIM.crop(crop.width * 2, crop.height * 2, crop.x, crop.y);
-    // }
-
-    bufferIM.resize(225 * 2, 350 * 2)
+      .gravity('Center')
+      .resize(225 * 2, 350 * 2)
       .resize(null, 350)
       .extent(225, 350)
       .repage('+')
@@ -63,15 +56,12 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
     return bufferIM;
   }
 
-  const bufferGM = gm(buffer);
-  // if (boost && boost.length <= 0 && crop && crop.score && crop.score.skin < 8 && crop.score.detail < 5 && (crop.score.saturation < -2 || crop.score.skin < -1 || crop.score.detail < -24)) {
-  //   bufferGM.gravity('Center');
-  // }
-  bufferGM.crop(crop.width, crop.height, crop.x, crop.y)
+  const bufferGM = gm(buffer)
+    .crop(crop.width, crop.height, crop.x, crop.y)
     .resize(width, height, '!')
     .flatten()
     .background('#ffffff')
-    .quality(95)
+    .quality(92)
     .toBuffer('jpg', (err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
@@ -100,22 +90,8 @@ const getBoost = async (buffer, frameNum = 0, userOptions) => {
 };
 
 const execute = async (url, width, height, userOptions) => {
-  let { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
+  const { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
   if (!buffer) return undefined;
-
-  if (isImageType(buffer, MAGIC.pngNumber)) {
-    buffer = await new Promise((resolve, reject) => {
-      im(buffer)
-        .flatten()
-        .fuzz(1, true)
-        .trim()
-        .repage('+')
-        .toBuffer((err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
-  }
 
   let boost = await getBoost(buffer, 0, userOptions);
   if ((!boost || boost.length <= 0) && isImageType(buffer, MAGIC.gifNumber)) {
