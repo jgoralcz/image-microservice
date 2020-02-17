@@ -61,7 +61,7 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
     .resize(width, height, '!')
     .flatten()
     .background('#ffffff')
-    .quality(90)
+    .quality(92)
     .toBuffer('jpg', (err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
