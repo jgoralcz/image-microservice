@@ -3,6 +3,9 @@ const cv = require('opencv');
 const im = require('gm').subClass({ imageMagick: true });
 const gm = require('gm');
 const smartcrop = require('smartcrop-gm');
+const imagemin = require('imagemin');
+const imageminMozjpeg = require('imagemin-mozjpeg');
+const imageminGiflossy = require('imagemin-giflossy');
 
 const MAGIC = Object.freeze({
   jpgNumber: 'ffd8ffe0',
@@ -40,20 +43,20 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
   });
 });
 
-const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((resolve, reject) => {
-  if (gif) {
-    const bufferIM = im(buffer)
+const promiseGM = (buffer, crop, width, height, isGif, boost) => new Promise((resolve, reject) => {
+  if (isGif) {
+    return im(buffer)
       .coalesce()
+      .sharpen(1.5, 1)
       .gravity('Center')
-      .resize(225 * 2, 350 * 2)
-      .resize(null, 350)
-      .extent(225, 350)
+      .resize(width * 2, height * 2)
+      .resize(null, height)
+      .extent(width, height)
       .repage('+')
       .toBuffer((err, buf) => {
         if (err) return reject(err);
         return resolve(buf);
       });
-    return bufferIM;
   }
 
   const bufferGM = gm(buffer)
@@ -61,7 +64,7 @@ const promiseGM = (buffer, crop, width, height, gif, boost) => new Promise((reso
     .resize(width, height, '!')
     .flatten()
     .background('#ffffff')
-    .quality(92)
+    .quality(98)
     .toBuffer('jpg', (err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
@@ -90,19 +93,46 @@ const getBoost = async (buffer, frameNum = 0, userOptions) => {
 };
 
 const execute = async (url, width, height, userOptions) => {
-  const { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
+  let { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
   if (!buffer) return undefined;
 
+  const isGif = isImageType(buffer, MAGIC.gifNumber);
+
   let boost = await getBoost(buffer, 0, userOptions);
-  if ((!boost || boost.length <= 0) && isImageType(buffer, MAGIC.gifNumber)) {
+  if ((!boost || boost.length <= 0) && isGif) {
     boost = await getBoost(buffer, 1, userOptions);
   }
 
-  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost });
-  if (isImageType(buffer, MAGIC.gifNumber)) {
-    return promiseGM(buffer, crop, width, height, true, boost);
+  if (isImageType(buffer, MAGIC.webp)) {
+    buffer = await new Promise((resolve, reject) => {
+      gm(buffer)
+        .flatten()
+        .background('#ffffff')
+        .quality(98)
+        .toBuffer('png', (err, buf) => {
+          if (err) return reject(err);
+          return resolve(buf);
+        });
+    });
   }
-  return promiseGM(buffer, crop, width, height, false, boost);
+
+  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost });
+  const imageBuffer = isGif
+    ? await promiseGM(buffer, crop, width, height, true, boost)
+    : await promiseGM(buffer, crop, width, height, false, boost);
+
+  return imagemin.buffer(imageBuffer, {
+    plugins: [
+      imageminMozjpeg({
+        progressive: false,
+        quality: 86,
+      }),
+      imageminGiflossy({
+        lossy: 35,
+        optimizationLevel: 3,
+      }),
+    ],
+  });
 };
 
 module.exports = execute;
