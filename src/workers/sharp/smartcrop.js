@@ -5,6 +5,7 @@ const gm = require('gm');
 const smartcrop = require('smartcrop-gm');
 const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
+const imageminPngquant = require('imagemin-pngquant');
 const imageminGiflossy = require('imagemin-giflossy');
 
 const MAGIC = Object.freeze({
@@ -52,25 +53,20 @@ const promiseGM = (buffer, crop, width, height, isGif, boost) => new Promise((re
       .resize(width * 2, height * 2)
       .resize(null, height)
       .extent(width, height)
-      .repage('+')
       .toBuffer((err, buf) => {
         if (err) return reject(err);
         return resolve(buf);
       });
   }
 
-  const bufferGM = gm(buffer)
+  return gm(buffer)
     .crop(crop.width, crop.height, crop.x, crop.y)
     .resize(width, height, '!')
-    .flatten()
-    .background('#ffffff')
     .quality(98)
-    .toBuffer('jpg', (err, buf) => {
+    .toBuffer((err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
     });
-
-  return bufferGM;
 });
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
@@ -106,8 +102,6 @@ const execute = async (url, width, height, userOptions) => {
   if (isImageType(buffer, MAGIC.webp)) {
     buffer = await new Promise((resolve, reject) => {
       gm(buffer)
-        .flatten()
-        .background('#ffffff')
         .quality(98)
         .toBuffer('png', (err, buf) => {
           if (err) return reject(err);
@@ -126,6 +120,9 @@ const execute = async (url, width, height, userOptions) => {
       imageminMozjpeg({
         progressive: false,
         quality: 86,
+      }),
+      imageminPngquant({
+        quality: [0.75, 0.85],
       }),
       imageminGiflossy({
         lossy: 35,
