@@ -1,11 +1,11 @@
 const fs = require('fs');
 const { fork } = require('child_process');
 const gifFrames = require('gif-frames');
-const MyBufferAccumulator = require('./workers/WorkerHelpers/BufferAccumulator');
 const util = require('util');
 
-const readdir = util.promisify(fs.readdir);
+const MyBufferAccumulator = require('./workers/WorkerHelpers/BufferAccumulator');
 
+const readdir = util.promisify(fs.readdir);
 
 /**
  * filters out the responses for the correct response to send
@@ -152,6 +152,7 @@ module.exports = {
 
     // loop through files, sync so we can get it over with
     const files = await readdir(this.dir);
+    // eslint-disable-next-line no-restricted-syntax
     for (const file of files) {
       // require the filepath then initialize the service.
       // eslint-disable-next-line import/no-dynamic-require,global-require
@@ -177,7 +178,6 @@ module.exports = {
           }
         }
       }
-
 
       // if we don't have an overriding initService, then let's use ours
       if (!endpoint.initService) {
