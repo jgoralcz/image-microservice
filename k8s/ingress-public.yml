@@ -4,7 +4,7 @@ metadata:
   name: ${SERVICE_NAME}
   namespace: josh-apps
   annotations:
-    nginx.ingress.kubernetes.io/limit-rpm: "10"
+    nginx.ingress.kubernetes.io/limit-rpm: "2"
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
