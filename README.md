@@ -7,7 +7,7 @@ docker by changing the number of processes in your `config.json` file.
 
 If your node version is less than 11.5 you must use `node --experimental-worker app.js` and install the 1 million dependencies (**use the Dockerfile and Docker!**)
 
-**You can test a live instance here (you get a max of 10 requests per minute): `beta-mims.bongo.best`**
+**You can test a live instance here (you will be rate limited): `beta-mims.bongo.best`**
 
 #### This microservice mainly uses:
 `Jimp@latest` - oof this is bad \

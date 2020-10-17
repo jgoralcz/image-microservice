@@ -188,9 +188,17 @@ const execute = async (url, width, height, userOptions) => {
 
   // already wanted width, height... no need to do any special processing...
   const { width: bufferWidth, height: bufferHeight } = await sizeOf(buffer);
-  const isGif = isImageType(buffer, MAGIC.gifNumber);
-  if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) return buffer;
+  const hasBorder = await checkBorder(buffer);
+  const { border: userBorder } = userOptions;
+  const isTransparent = await checkTransparency(buffer);
 
+  if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) {
+    return hasBorder || isTransparent || !userBorder
+      ? buffer
+      : border(buffer, userBorder.x, userBorder.y, userBorder.color, width, height);
+  }
+
+  const isGif = isImageType(buffer, MAGIC.gifNumber);
   let boost = await getBoost(buffer, 0, userOptions);
   if ((!boost || boost.length <= 0) && isGif) {
     boost = await getBoost(buffer, 1, userOptions);
@@ -214,11 +222,7 @@ const execute = async (url, width, height, userOptions) => {
     ? await promiseGM(buffer, crop, width, height, true, bufferWidth, bufferHeight)
     : await promiseGM(buffer, crop, width, height, false, bufferWidth, bufferHeight);
 
-  const isTransparent = await checkTransparency(processedBuffer);
-  const hasBorder = await checkBorder(buffer);
-
   // add their border if they requested one and image is not transparent
-  const { border: userBorder } = userOptions;
   const imageBuffer = hasBorder || isTransparent || !userBorder
     ? processedBuffer
     : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
