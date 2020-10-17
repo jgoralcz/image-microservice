@@ -24,7 +24,7 @@ jobs:
 
       - name: Build Ingress file
         shell: bash
-        run: echo "##[set-output name=ingress;]$([ "${GITHUB_REF##*/}" == "master" ] && echo "ingress.yml" || echo "ingress-public.yml")"
+        run: echo "##[set-output name=ingress;]$([ "${GITHUB_REF##*/}" == "master" ] && echo "k8s/ingress.yml" || echo "k8s/ingress-public.yml")"
         id: extract_ingress
 
       - name: Push to GitHub Packages
@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           kubectl set image deployment/${{ env.SERVICE_NAME }} ${{ env.SERVICE_NAME }}=${{ env.IMAGE_LOCATION }} || echo "${{ env.SERVICE_NAME }} deployment not found"\
-          && envsubst < k8s/{{ steps.extract_ingress.outputs.ingress }} | kubectl apply -f - \
+          && envsubst < {{ steps.extract_ingress.outputs.ingress }} | kubectl apply -f - \
           && envsubst < k8s/service.yml | kubectl apply -f - \
           && envsubst < k8s/deployment.yml | kubectl apply -f - \
           && kubectl rollout restart deployment/${{ env.SERVICE_NAME}}
