@@ -1,4 +1,4 @@
-# Manipulating Images Microservice (MIMS)
+# Manipulating Images Microservice (MIMS) v2
 A microservice API to process images using Node.js (although you shouldn't really use Node for processing images).
 This microservice uses about 500mb of ram when starting out and can be up to 900mb or more due to the number of requests you have.
 A default of 3 processes is created (see `config.json`). Processes are indeed heavy. Only create more if you really need the concurency. 
