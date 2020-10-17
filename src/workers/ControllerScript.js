@@ -35,6 +35,7 @@ const triggered = require('./canvas/Triggered');
 const america = require('./canvas/America');
 const weeb = require('./canvas/Weeb');
 const ping = require('./canvas/Ping');
+const tweet = require('./htmlToImage/tweet');
 
 const homie = require('./jimp/Homie.js');
 
@@ -419,6 +420,10 @@ process.on('message', async (message) => {
 
       case 'magik':
         buffer = await magik(body.image_url);
+        break;
+
+      case 'tweet':
+        buffer = await tweet(body.username, body.text, body.date);
         break;
 
       default:
