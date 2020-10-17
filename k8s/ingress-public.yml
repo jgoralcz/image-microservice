@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: josh-apps
+  annotations:
+    nginx.ingress.kubernetes.io/limit-rpm: "10"
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: ${HOST_URL}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: ${SERVICE_NAME}
+              servicePort: ${PORT}
+  tls:
+    - hosts:
+        - ${HOST_URL}
+      secretName: ssl-bongo

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: josh-apps
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ${SERVICE_NAME}
+  template:
+    metadata:
+      labels:
+        app: ${SERVICE_NAME}
+    spec:
+      nodeSelector:
+        location: na
+      containers:
+        - name: ${SERVICE_NAME}
+          image: ${IMAGE_LOCATION}
+          imagePullPolicy: Always
+          env:
+            - name: PORT
+              value: "${PORT}"
+            - name: NODE_ENV
+              value: "${ENV}"
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2048Mi
+            requests:
+              cpu: 1000m
+              memory: 1024Mi
+          ports:
+            - containerPort: 8443
+      imagePullSecrets:
+        - name: github-registry
