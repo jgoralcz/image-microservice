@@ -48,7 +48,7 @@ jobs:
         shell: bash
         run: |
           kubectl set image deployment/${{ env.SERVICE_NAME }} ${{ env.SERVICE_NAME }}=${{ env.IMAGE_LOCATION }} || echo "${{ env.SERVICE_NAME }} deployment not found"\
-          && envsubst < k8s/{{ steps.extract_ingress.outputs.ingress}}.yml | kubectl apply -f - \
+          && envsubst < k8s/{{ steps.extract_ingress.outputs.ingress }} | kubectl apply -f - \
           && envsubst < k8s/service.yml | kubectl apply -f - \
           && envsubst < k8s/deployment.yml | kubectl apply -f - \
           && kubectl rollout restart deployment/${{ env.SERVICE_NAME}}
