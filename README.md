@@ -1,5 +1,5 @@
-# Manipulating Images Microservice (MIMS) v2
-A microservice API to process images using Node.js (although you shouldn't really use Node for processing images).
+# Manipulating Images Microservice (MIMS) - v2
+MIMS is a microservice API which processes images using Node.js.
 This microservice uses about 500mb of ram when starting out and can be up to 900mb or more due to the number of requests you have.
 A default of 3 processes is created (see `config.json`). Processes are indeed heavy. Only create more if you really need the concurency. 
 You may need fewer or more depending on your use case. If that's the case then you must specify that when running
@@ -9,23 +9,19 @@ If your node version is less than 11.5 you must use `node --experimental-worker 
 
 **You can test a live instance here (you will be rate limited): `beta-mims.bongo.best`**
 
-#### This microservice mainly uses:
-`Jimp@latest` - oof this is bad \
-`node-canvas@latest` \
-`Sharp@latest`
-`gm@latest`
-
 ___
 
-### Installation
-To install docker on linux: `curl -sSL https://get.docker.com/ | bash` \
+### Installation and Running
+To install docker on linux (ubuntu or debian): `curl -sSL https://get.docker.com/ | bash` \
 Otherwise, look it up.
 
-To build and run it I do something like so: \
-`git clone https://github.com/jgoralcz/image-microservice` \
-`cd image-microservice` \
-`docker build -t mims .` \
-`docker run -d -p 8443:8443 --restart=always --memory="2048m" --name mims mims`
+
+Then simply run a docker command targeting my image on docker hub:
+`docker rm -f mims || true && docker run -p 8443:8443 -d --restart=always --memory="1024m" --name mims joshgor01/image-microservice:beta`.
+
+If you want dev branch changes, or check the other images at: https://hub.docker.com/repository/docker/joshgor01/image-microservice
+
+Then you can view the logs with `docker logs -f mims`.
 
 ___
 
