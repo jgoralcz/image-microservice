@@ -22,6 +22,11 @@ jobs:
         run: echo "##[set-output name=prefix;]$([ "${GITHUB_REF##*/}" == "master" ] && echo "" || echo "beta-")"
         id: extract_prefix
 
+      - name: Build Deploy Type
+        shell: bash
+        run: echo "##[set-output name=deployment;]$([ "${GITHUB_REF##*/}" == "master" ] && echo "k8s/deployment.yml" || echo "k8s/deployment-public.yml")"
+        id: extract_deployment
+
       - name: Build Ingress Type
         shell: bash
         run: echo "##[set-output name=ingress;]$([ "${GITHUB_REF##*/}" == "master" ] && echo "k8s/ingress.yml" || echo "k8s/ingress-public.yml")"
@@ -50,9 +55,10 @@ jobs:
           kubectl set image deployment/${{ env.SERVICE_NAME }} ${{ env.SERVICE_NAME }}=${{ env.IMAGE_LOCATION }} || echo "${{ env.SERVICE_NAME }} deployment not found"\
           && envsubst < ${{ env.INGRESS }} | kubectl apply -f - \
           && envsubst < k8s/service.yml | kubectl apply -f - \
-          && envsubst < k8s/deployment.yml | kubectl apply -f - \
+          && envsubst < ${{ env.DEPLOYMENT }} | kubectl apply -f - \
           && kubectl rollout restart deployment/${{ env.SERVICE_NAME}}
         env:
+          DEPLOYMENT: ${{ steps.extract_deployment.outputs.deployment }}
           INGRESS: ${{ steps.extract_ingress.outputs.ingress }}
           ENV: ${{ steps.extract_environment.outputs.env }}
           IMAGE_LOCATION: docker.pkg.github.com/jgoralcz/${{ steps.extract_repo.outputs.repo }}/${{ steps.extract_repo.outputs.repo }}:${{ steps.extract_environment.outputs.env }}
