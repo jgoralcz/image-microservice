@@ -10,8 +10,8 @@ metadata:
     # name of the secret that contains the user/password definitions
     # found here: https://longhorn.io/docs/1.0.2/deploy/accessing-the-ui/longhorn-ingress/
     # created with this example: USER=foo; PASSWORD=bar; echo "${USER}:$(openssl passwd -stdin -apr1 <<< ${PASSWORD})" >> MIMS_BASIC_AUTH_ENV
-    # kubectl -n namespace_here create secret generic basic-auth --from-file=MIMS_BASIC_AUTH_ENV
-    nginx.ingress.kubernetes.io/auth-secret: MIMS_BASIC_AUTH_ENV
+    # kubectl -n namespace_here create secret generic mims-basic-auth --from-file=MIMS_BASIC_AUTH_ENV
+    nginx.ingress.kubernetes.io/auth-secret: mims-basic-auth
     # message to display with an appropriate context why the authentication is required
     nginx.ingress.kubernetes.io/auth-realm: "Authentication Required"
     kubernetes.io/ingress.class: nginx
