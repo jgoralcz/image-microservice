@@ -45,11 +45,10 @@ const loadBuffer = require('./canvas/LoadBuffer.js');
 // sharp
 const sharpen = require('./sharp/Sharpen.js');
 const blur = require('./sharp/Blur.js');
-const smartcrop = require('./sharp/smartcrop');
 
 // gm
 const magik = require('./gm/Magik');
-
+const smartcrop = require('./gm/smartcrop');
 
 // check that the sorter was called as a worker thread
 process.on('message', async (message) => {
