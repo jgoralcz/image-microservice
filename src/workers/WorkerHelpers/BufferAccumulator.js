@@ -8,8 +8,8 @@ module.exports = class MyBufferAccumulator extends Writable {
     this.once('finish', () => { this.finished = true; });
   }
 
+  // eslint-disable-next-line no-underscore-dangle
   _write(chunk, encoding, callback) {
-    // tslint:disable-next-line:no-console
     this.accumulator = Buffer.concat([this.accumulator, chunk]);
     if (typeof encoding === 'function') { encoding(); }
     if (typeof callback === 'function') { callback(); }

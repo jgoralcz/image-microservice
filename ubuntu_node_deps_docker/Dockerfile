@@ -1,10 +1,13 @@
-FROM ubuntu:14.04
+FROM ubuntu:18.04
+
+ENV TZ=America/Chicago
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /usr/src/app
 
 RUN apt-get update -y && apt-get install --force-yes -yy
 RUN apt-get -y install curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_11.x  | bash -
+RUN curl -sL https://deb.nodesource.com/setup_12.x  | bash -
 RUN apt-get -y install nodejs
 
 # node canvas
@@ -24,8 +27,14 @@ RUN apt-get update -y && apt-get install --force-yes -yy \
   libjemalloc1 \
   && rm -rf /var/lib/apt/lists/*
 
+# libjasper-dev
+RUN echo "deb http://security.ubuntu.com/ubuntu xenial-security main" | tee /etc/apt/sources.list.d/xenial.list
+RUN apt update && apt install libjasper1 libjasper-dev -y
+RUN rm /etc/apt/sources.list.d/xenial.list
+RUN apt update
+
 # Change memory allocator to avoid "leaks"
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
+# ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
 
 RUN apt-get update && apt-get install -y \ 
   wget \
@@ -37,8 +46,7 @@ RUN apt-get update && apt-get install -y \
   python-dev \ 
   python-opencv \ 
   libopencv-dev \ 
-  libav-tools  \ 
-  libjpeg-dev \ 
+  ffmpeg  \ 
   libpng-dev \ 
   libtiff-dev \ 
   libjasper-dev \ 

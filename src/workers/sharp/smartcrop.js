@@ -7,6 +7,33 @@ const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminPngquant = require('imagemin-pngquant');
 const imageminGiflossy = require('imagemin-giflossy');
+const sizeOf = require('image-size');
+const Jimp = require('jimp');
+
+/*
+  example body: {
+    "image_url": "https://media.discordapp.net/attachments/762010982536314891/766403625773563918/image0.png",
+    "width": 315,
+    "height": 490,
+    "minBufferSize": 40000,
+    "options": {
+        "animeFace": true,
+        "border": {
+            "x": 1.4,
+            "y": 1.4,
+            "color": "white"
+        },
+        "sharpen": {
+            "minX": 225,
+            "minY": 350,
+            "minBufferSize": 25000,
+            "maxX": 225,
+            "maxY": 350,
+            "maxBufferSize": 40000
+        }
+    }
+  }
+*/
 
 const MAGIC = Object.freeze({
   jpgNumber: 'ffd8ffe0',
@@ -18,12 +45,14 @@ const MAGIC = Object.freeze({
   webp: '52494646',
 });
 
+const ANIME_FACE_CASCADE = '/usr/src/app/assets/opencv/lbpcascade_animeface.xml';
+
 const isImageType = (buffer, type = MAGIC.gifNumber) => buffer.toString('hex', 0, 4) === type;
 
 const faceDetect = (input, userOptions) => new Promise((resolve, reject) => {
   cv.readImage(input, (err, image) => {
     if (err) return reject(err);
-    return image.detectObject((userOptions.face) ? cv.FACE_CASCADE : cv.ANIME_FACE_CASCADE, {}, (error, faces) => {
+    return image.detectObject(userOptions.face ? cv.FACE_CASCADE : ANIME_FACE_CASCADE, {}, (error, faces) => {
       if (error) return reject(error);
       const boost = faces.map((face) => ({
         x: face.x,
@@ -44,34 +73,106 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
   });
 });
 
-const promiseGM = (buffer, crop, width, height, isGif, boost) => new Promise((resolve, reject) => {
+const border = (buffer, borderXSize, borderYSize, color, wantedWidth, wantedHeight) => new Promise((resolve, reject) => gm(buffer)
+  .border(borderXSize, borderYSize)
+  .borderColor(color)
+  .resize(wantedWidth, wantedHeight, '!')
+  .toBuffer((err, buf) => {
+    if (err) return reject(err);
+    return resolve(buf);
+  }));
+
+const checkBorder = async (buffer) => {
+  // use jimp because it is easier to read and check for a transparent pixel
+  const image = await Jimp.read(buffer);
+
+  const { width, height } = image.bitmap;
+
+  const midTop = await image.getPixelColor(width / 2, 1);
+  const veryMidTop = await image.getPixelColor(width / 2, 0);
+
+  const midBottom = await image.getPixelColor(width / 2, height - 2);
+  const veryMidBottom = await image.getPixelColor(width / 2, height - 1);
+
+  const midLeft = await image.getPixelColor(1, height / 2);
+  const veryMidLeft = await image.getPixelColor(0, height / 2);
+
+  const midRight = await image.getPixelColor(width - 2, height / 2);
+  const veryMidRight = await image.getPixelColor(width, height / 2);
+
+  return (midTop === midBottom && midLeft === midRight) || (veryMidTop === veryMidBottom || veryMidLeft === veryMidRight);
+};
+
+const checkTransparency = async (buffer) => {
+  // resize so we don't need to process anything extra
+  const thumbnailBuffer = await new Promise((resolve, reject) => {
+    gm(buffer).resize(25, 25, '!').toBuffer((err, buf) => {
+      if (err) return reject(err);
+      return resolve(buf);
+    });
+  });
+
+  // use jimp because it is easier to read and check for a transparent pixel
+  const image = await Jimp.read(thumbnailBuffer);
+
+  return new Promise((resolve) => {
+    image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
+      if (image.bitmap.data[idx + 3] === 0) {
+        return resolve(true);
+      }
+      if (x === image.bitmap.width - 1 && y === image.bitmap.height - 1) {
+        return resolve(false);
+      }
+    });
+  });
+};
+
+const promiseGM = (buffer, crop, width, height, isGif, bufferWidth, bufferHeight, sharpenOptions) => new Promise((resolve, reject) => {
   if (isGif) {
-    return im(buffer)
-      .coalesce()
-      .sharpen(1.5, 1)
-      .gravity('Center')
-      .resize(width * 2, height * 2)
-      .resize(null, height)
-      .extent(width, height)
-      .toBuffer((err, buf) => {
+    const imBuff = im(buffer)
+      .coalesce();
+    // some images with very low quality need more colors or sharpened.
+    if (sharpenOptions && ((bufferWidth <= sharpenOptions.minX && bufferHeight <= sharpenOptions.minY && buffer.length < sharpenOptions.minBufferSize)
+      || (bufferWidth <= sharpenOptions.maxX && bufferHeight <= sharpenOptions.maxY
+        && bufferWidth > sharpenOptions.minX && bufferHeight > sharpenOptions.minY && buffer.length < sharpenOptions.maxBufferSize))) {
+      imBuff.sharpen(2, 1);
+    }
+
+    if (imBuff && crop) {
+      imBuff.crop(crop.width, crop.height, crop.x, crop.y);
+    }
+
+    imBuff.resize(width, height, '!')
+      .toBuffer('gif', (err, buf) => {
         if (err) return reject(err);
         return resolve(buf);
       });
   }
 
-  return gm(buffer)
-    .crop(crop.width, crop.height, crop.x, crop.y)
-    .resize(width, height, '!')
-    .quality(98)
-    .toBuffer((err, buf) => {
+  const gmBuff = gm(buffer);
+  // some images with very low quality need more colors or sharpened.
+  if (sharpenOptions && ((bufferWidth <= sharpenOptions.minX && bufferHeight <= sharpenOptions.minY && buffer.length < sharpenOptions.minBufferSize)
+    || (bufferWidth <= sharpenOptions.maxX && bufferHeight <= sharpenOptions.maxY
+      && bufferWidth > sharpenOptions.minX && bufferHeight > sharpenOptions.minY && buffer.length < sharpenOptions.maxBufferSize))) {
+    gmBuff.sharpen(2, 1);
+  }
+
+  if (gmBuff && crop) {
+    gmBuff.crop(crop.width, crop.height, crop.x, crop.y);
+  }
+
+  gmBuff.resize(width, height, '!')
+    .toBuffer('png', (err, buf) => {
       if (err) return reject(err);
       return resolve(buf);
     });
 });
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
+  if (!userOptions.face && !userOptions.animeFace) return [];
+
   const frameBuffer = await promiseGMBufferFrame(buffer, frameNum);
-  if (!frameBuffer || !frameBuffer.toString) return undefined;
+  if (!frameBuffer || !frameBuffer.toString) return [];
 
   const reduceQualityBuffer = (frameBuffer.toString().length > 10000)
     ? await new Promise((resolve, reject) => {
@@ -84,25 +185,31 @@ const getBoost = async (buffer, frameNum = 0, userOptions) => {
     })
     : frameBuffer;
 
-  const boost = await faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
-  return boost;
+  return faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 };
 
 const execute = async (url, width, height, userOptions) => {
   let { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
   if (!buffer) return undefined;
 
-  const isGif = isImageType(buffer, MAGIC.gifNumber);
+  const isWebP = isImageType(buffer, MAGIC.webp);
 
-  let boost = await getBoost(buffer, 0, userOptions);
-  if ((!boost || boost.length <= 0) && isGif) {
-    boost = await getBoost(buffer, 1, userOptions);
+  // already wanted width, height... no need to do any special processing...
+  const { width: bufferWidth, height: bufferHeight } = await sizeOf(buffer);
+  const hasBorder = isWebP ? false : await checkBorder(buffer);
+  const { border: userBorder } = userOptions;
+
+  const isTransparent = isWebP ? true : await checkTransparency(buffer);
+
+  if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) {
+    return hasBorder || isTransparent || !userBorder
+      ? buffer
+      : border(buffer, userBorder.x, userBorder.y, userBorder.color, width, height);
   }
 
-  if (isImageType(buffer, MAGIC.webp)) {
+  if (isWebP) {
     buffer = await new Promise((resolve, reject) => {
       gm(buffer)
-        .quality(98)
         .toBuffer('png', (err, buf) => {
           if (err) return reject(err);
           return resolve(buf);
@@ -110,24 +217,36 @@ const execute = async (url, width, height, userOptions) => {
     });
   }
 
-  const { topCrop: crop } = await smartcrop.crop(buffer, { width, height, boost });
-  const imageBuffer = isGif
-    ? await promiseGM(buffer, crop, width, height, true, boost)
-    : await promiseGM(buffer, crop, width, height, false, boost);
+  const isGif = isImageType(buffer, MAGIC.gifNumber);
+  let boost = await getBoost(buffer, 0, userOptions);
+  if ((!boost || boost.length <= 0) && isGif) {
+    boost = await getBoost(buffer, 1, userOptions);
+  }
+
+  const bufferRatio = (bufferWidth / bufferHeight).toFixed(2);
+  const wantedRatio = (width / height).toFixed(2);
+
+  const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
+  const processedBuffer = isGif
+    ? await promiseGM(buffer, crop, width, height, true, bufferWidth, bufferHeight)
+    : await promiseGM(buffer, crop, width, height, false, bufferWidth, bufferHeight);
+
+  // add their border if they requested one and image is not transparent
+  const imageBuffer = hasBorder || isTransparent || !userBorder
+    ? processedBuffer
+    : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
 
   return imagemin.buffer(imageBuffer, {
     plugins: [
       imageminMozjpeg({
         progressive: false,
-        quality: 86,
+        quality: 98,
       }),
       imageminPngquant({
-        quality: [0.75, 0.85],
+        quality: [0.96, 1.00],
+        speed: 1,
       }),
-      imageminGiflossy({
-        lossy: 35,
-        optimizationLevel: 3,
-      }),
+      imageminGiflossy({ unoptimize: true, 'keep-empty': true }),
     ],
   });
 };
