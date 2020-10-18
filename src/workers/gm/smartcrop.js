@@ -45,7 +45,7 @@ const MAGIC = Object.freeze({
   webp: '52494646',
 });
 
-const ANIME_FACE_CASCADE = '/usr/src/app/assets/opencv/lbpcascade_animeface.xml';
+const ANIME_FACE_CASCADE = '/usr/node/assets/opencv/lbpcascade_animeface.xml';
 
 const isImageType = (buffer, type = MAGIC.gifNumber) => buffer.toString('hex', 0, 4) === type;
 
