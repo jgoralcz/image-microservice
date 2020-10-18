@@ -2,7 +2,7 @@
   "name": "image-microservice",
   "version": "1.0.0",
   "description": "image processing api",
-  "main": "src/app.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
