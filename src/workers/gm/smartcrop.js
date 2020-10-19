@@ -143,10 +143,11 @@ const promiseGM = (buffer, crop, width, height, isGif, bufferWidth, bufferHeight
     }
 
     imBuff.resize(width, height, '!')
-      .toBuffer('gif', (err, buf) => {
+      .toBuffer((err, buf) => {
         if (err) return reject(err);
         return resolve(buf);
       });
+    return imBuff;
   }
 
   const gmBuff = gm(buffer);
@@ -166,6 +167,7 @@ const promiseGM = (buffer, crop, width, height, isGif, bufferWidth, bufferHeight
       if (err) return reject(err);
       return resolve(buf);
     });
+  return gmBuff;
 });
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
@@ -227,9 +229,7 @@ const execute = async (url, width, height, userOptions) => {
   const wantedRatio = (width / height).toFixed(2);
 
   const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
-  const processedBuffer = isGif
-    ? await promiseGM(buffer, crop, width, height, true, bufferWidth, bufferHeight)
-    : await promiseGM(buffer, crop, width, height, false, bufferWidth, bufferHeight);
+  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, bufferWidth, bufferHeight);
 
   // add their border if they requested one and image is not transparent
   const imageBuffer = hasBorder || isTransparent || !userBorder
