@@ -73,34 +73,59 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
   });
 });
 
-const border = (buffer, borderXSize, borderYSize, color, wantedWidth, wantedHeight) => new Promise((resolve, reject) => gm(buffer)
-  .border(borderXSize, borderYSize)
-  .borderColor(color)
-  .resize(wantedWidth, wantedHeight, '!')
-  .toBuffer((err, buf) => {
-    if (err) return reject(err);
-    return resolve(buf);
-  }));
+const border = (buffer, borderXSize, borderYSize, color, wantedWidth, wantedHeight) => new Promise(
+  (resolve, reject) => gm(buffer)
+    .border(borderXSize, borderYSize)
+    .borderColor(color)
+    .gravity('center')
+    .resize(wantedWidth, wantedHeight, '!')
+    .toBuffer((err, buf) => {
+      if (err) return reject(err);
+      return resolve(buf);
+    }),
+);
 
-const checkBorder = async (buffer) => {
-  // use jimp because it is easier to read and check for a transparent pixel
+const checkBorder = async (buffer, desiredWidth, desiredHeight) => {
   const image = await Jimp.read(buffer);
 
   const { width, height } = image.bitmap;
+  if (width < 10 || height < 10) return false;
 
-  const midTop = await image.getPixelColor(width / 2, 1);
-  const veryMidTop = await image.getPixelColor(width / 2, 0);
+  const midTops = [];
+  const midBottoms = [];
+  const midLefts = [];
+  const midRights = [];
+  for (let x = 0; x < 10; x += 1) {
+    for (let y = 0; y < 10; y += 1) {
+      midTops.push(await image.getPixelColor(width / 2 + x, y));
+      midBottoms.push(await image.getPixelColor(width / 2 + x, height - y));
+      midLefts.push(await image.getPixelColor(x, height / 2 + y));
+      midRights.push(await image.getPixelColor(width - x, height / 2 + y));
 
-  const midBottom = await image.getPixelColor(width / 2, height - 2);
-  const veryMidBottom = await image.getPixelColor(width / 2, height - 1);
+      if (midTops[midTops.length - 1] === midBottoms[midBottoms.length - 1]
+        || midLefts[midLefts.length - 1] === midRights[midRights.length - 1]) {
+        return true;
+      }
+    }
+  }
 
-  const midLeft = await image.getPixelColor(1, height / 2);
-  const veryMidLeft = await image.getPixelColor(0, height / 2);
+  // be a little more questionable with this ratio
+  const ratio = (Math.round((width / height) * 1000) / 1000).toFixed(3);
+  if ((desiredWidth === width && desiredHeight === height) || ratio === '0.643') {
+    for (let i = 1; i <= midTops.length - 1; i += 1) {
+      if ((midTops[i] === midTops[i - 1] || midBottoms[i] === midBottoms[i - 1])
+        || (midRights[i] === midRights[i - 1] || midLefts[i] === midRights[i - 1])) {
+        return true;
+      }
+    }
+  }
 
-  const midRight = await image.getPixelColor(width - 2, height / 2);
-  const veryMidRight = await image.getPixelColor(width, height / 2);
+  const topLeftCorner = await image.getPixelColor(0, 0);
+  const topRightCorner = await image.getPixelColor(width, 0);
+  const bottomLeftCorner = await image.getPixelColor(0, height);
+  const bottomRightCorner = await image.getPixelColor(width, height);
 
-  return (midTop === midBottom && midLeft === midRight) || (veryMidTop === veryMidBottom || veryMidLeft === veryMidRight);
+  return topLeftCorner === topRightCorner && bottomLeftCorner === bottomRightCorner;
 };
 
 const checkTransparency = async (buffer) => {
@@ -187,6 +212,7 @@ const getBoost = async (buffer, frameNum = 0, userOptions) => {
     })
     : frameBuffer;
 
+
   return faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 };
 
@@ -195,13 +221,16 @@ const execute = async (url, width, height, userOptions) => {
   if (!buffer) return undefined;
 
   const isWebP = isImageType(buffer, MAGIC.webp);
+  const isGif = isImageType(buffer, MAGIC.gifNumber);
+
+  const tempBuffer = isGif ? await promiseGMBufferFrame(buffer, 0) : buffer;
 
   // already wanted width, height... no need to do any special processing...
-  const { width: bufferWidth, height: bufferHeight } = await sizeOf(buffer);
-  const hasBorder = isWebP ? false : await checkBorder(buffer);
+  const { width: bufferWidth, height: bufferHeight } = await sizeOf(tempBuffer);
+  const hasBorder = isWebP ? false : await checkBorder(tempBuffer, width, height);
   const { border: userBorder } = userOptions;
 
-  const isTransparent = isWebP ? true : await checkTransparency(buffer);
+  const isTransparent = isWebP ? true : await checkTransparency(tempBuffer);
 
   if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) {
     return hasBorder || isTransparent || !userBorder
@@ -219,7 +248,6 @@ const execute = async (url, width, height, userOptions) => {
     });
   }
 
-  const isGif = isImageType(buffer, MAGIC.gifNumber);
   let boost = await getBoost(buffer, 0, userOptions);
   if ((!boost || boost.length <= 0) && isGif) {
     boost = await getBoost(buffer, 1, userOptions);
