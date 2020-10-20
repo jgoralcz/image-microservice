@@ -21,7 +21,6 @@ RUN npm install gifencoder && npm install gif-encoder-2 && npm install gif-frame
 RUN npm install smartcrop-gm && npm install gm
 RUN apt-get install autoconf -y
 RUN apt-get install dh-autoreconf -y
-RUN npm install imagemin imagemin-mozjpeg imagemin-giflossy imagemin-pngquant
 
 RUN npm install
 
