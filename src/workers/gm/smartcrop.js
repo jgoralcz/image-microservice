@@ -10,6 +10,8 @@ const imageminGiflossy = require('imagemin-giflossy');
 const sizeOf = require('image-size');
 const Jimp = require('jimp');
 
+// for extensive testing: docker rm -f mims-v2 || true && docker run -v /Users/Josh/Documents/GitHub/image-microservice//src/workers/gm:/usr/node/src/workers/gm -d -p 8444:8443 --name mims-v2 mims-v2
+
 /*
   example body: {
     "image_url": "https://media.discordapp.net/attachments/762010982536314891/766403625773563918/image0.png",
@@ -43,6 +45,7 @@ const MAGIC = Object.freeze({
   jpgGeneral: 'ffd8ff',
   webm: '1f45dfa3',
   webp: '52494646',
+  JIMP_WHITE_NUMBER: 4294967295,
 });
 
 const ANIME_FACE_CASCADE = '/usr/node/assets/opencv/lbpcascade_animeface.xml';
@@ -86,15 +89,15 @@ const border = (buffer, borderXSize, borderYSize, color, wantedWidth, wantedHeig
 );
 
 const checkBorder = async (buffer) => {
-  const image = await (await Jimp.read(buffer)).resize(100, Jimp.AUTO);
+  const image = await Jimp.read(buffer);
 
   const { width, height } = image.bitmap;
   if (width < 10 || height < 10) return false;
 
-  const topLeftCorner = await image.getPixelColor(0, 0);
-  const topRightCorner = await image.getPixelColor(width, 0);
-  const bottomLeftCorner = await image.getPixelColor(0, height);
-  const bottomRightCorner = await image.getPixelColor(width, height);
+  const topLeftCorner = image.getPixelColor(0, 0);
+  const topRightCorner = image.getPixelColor(width, 0);
+  const bottomLeftCorner = image.getPixelColor(0, height);
+  const bottomRightCorner = image.getPixelColor(width, height);
 
   if (topLeftCorner === topRightCorner && bottomLeftCorner === bottomRightCorner) {
     return true;
@@ -118,19 +121,15 @@ const checkBorder = async (buffer) => {
     }
   });
 
-  const midTops = [];
-  const midBottoms = [];
-  const midLefts = [];
-  const midRights = [];
   for (let x = 0; x < 10; x += 1) {
     for (let y = 0; y < 10; y += 1) {
-      midTops.push(await image.getPixelColor(width / 2 + y, y));
-      midBottoms.push(await image.getPixelColor(width / 2 + y, height - y));
-      midLefts.push(await image.getPixelColor(x, height / 2 + y));
-      midRights.push(await image.getPixelColor(width - x, height / 2 + y));
+      const midTop = image.getPixelColor(width / 2 + x, y);
+      const midBottom = image.getPixelColor(width / 2 + y, height - y);
+      const midLeft = image.getPixelColor(x, height / 2 + y);
+      const midRight = image.getPixelColor(width - x, height / 2 + y);
 
-      if (midTops[midTops.length - 1] === midBottoms[midBottoms.length - 1] && midTops[midTops.length - 1] === 4294967295
-        && midLefts[midLefts.length - 1] === midRights[midRights.length - 1] && midRights[midRights.length - 1] === 4294967295) {
+      if ((midTop === midBottom && midTop === MAGIC.JIMP_WHITE_NUMBER)
+        || (midLeft === midRight && midRight === MAGIC.JIMP_WHITE_NUMBER)) {
         return true;
       }
     }
@@ -175,7 +174,7 @@ const promiseGM = (buffer, crop, width, height, isGif, bufferWidth, bufferHeight
     }
 
     if (imBuff && crop) {
-      imBuff.crop(crop.width, crop.height, crop.x, crop.y);
+      imBuff.crop(crop.width, crop.height, crop.x, crop.y).repage('+');
     }
 
     imBuff.resize(width, height, '!')
