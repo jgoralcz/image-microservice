@@ -45,6 +45,7 @@ const MAGIC = Object.freeze({
   jpgGeneral: 'ffd8ff',
   webm: '1f45dfa3',
   webp: '52494646',
+  JIMP_WHITE_NUMBER: 4294967295,
 });
 
 const ANIME_FACE_CASCADE = '/usr/node/assets/opencv/lbpcascade_animeface.xml';
@@ -127,8 +128,8 @@ const checkBorder = async (buffer) => {
       const midLeft = image.getPixelColor(x, height / 2 + y);
       const midRight = image.getPixelColor(width - x, height / 2 + y);
 
-      if ((midTop === midBottom && midTop === 4294967295)
-        || (midLeft === midRight && midRight === 4294967295)) {
+      if ((midTop === midBottom && midTop === MAGIC.JIMP_WHITE_NUMBER)
+        || (midLeft === midRight && midRight === MAGIC.JIMP_WHITE_NUMBER)) {
         return true;
       }
     }
