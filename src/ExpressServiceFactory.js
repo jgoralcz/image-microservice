@@ -80,9 +80,10 @@ const createWorker = (script, responses) => {
     }
   });
 
-  worker.on('error', (err) => {
-    logger.error(err);
-  });
+  // TODO: look into why this causes problems
+  // worker.on('error', (err) => {
+  //   logger.error(err);
+  // });
 
   return worker;
 };
