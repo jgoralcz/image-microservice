@@ -1,4 +1,5 @@
 const fs = require('fs');
+const logger = require('log4js').getLogger();
 const { fork } = require('child_process');
 const gifFrames = require('gif-frames');
 const util = require('util');
@@ -58,7 +59,7 @@ const createWorker = (script, responses) => {
     const response = await filterResponses(responses, requestNum);
 
     if (!response) {
-      console.error('Could not find response for this requested number.');
+      logger.error('Could not find response for this requested number.');
       return;
     }
 
@@ -77,6 +78,10 @@ const createWorker = (script, responses) => {
       response.contentType('application/json');
       response.send('{ "error": "server error, image has errors." }');
     }
+  });
+
+  worker.on('error', (err) => {
+    logger.error(err);
   });
 
   return worker;
