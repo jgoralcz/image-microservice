@@ -48,6 +48,14 @@ const MAGIC = Object.freeze({
   JIMP_WHITE_NUMBER: 4294967295,
 });
 
+const targetColor = {
+  r: 255,
+  g: 255,
+  b: 255,
+};
+
+const colorDistance = (c1, c2) => ((c1.r - c2.r) + (c1.g - c2.g) + (c1.b - c2.b)) / 3;
+
 const ANIME_FACE_CASCADE = '/usr/node/assets/opencv/lbpcascade_animeface.xml';
 
 const isImageType = (buffer, type = MAGIC.gifNumber) => buffer.toString('hex', 0, 4) === type;
@@ -94,26 +102,14 @@ const checkBorder = async (buffer) => {
   const { width, height } = image.bitmap;
   if (width < 10 || height < 10) return false;
 
-  const topLeftCorner = image.getPixelColor(0, 0);
-  const topRightCorner = image.getPixelColor(width, 0);
-  const bottomLeftCorner = image.getPixelColor(0, height);
-  const bottomRightCorner = image.getPixelColor(width, height);
-
-  if (topLeftCorner === topRightCorner && bottomLeftCorner === bottomRightCorner) {
-    return true;
-  }
-
-  const targetColor = { r: 255, g: 255, b: 255, a: 255 };
-  const colorDistance = (c1, c2) => Math.sqrt(((c1.r - c2.r) * (c1.r - c2.r) + (c1.g - c2.g) * (c1.g - c2.g) + (c1.b - c2.b) * (c1.b - c2.b) + (c1.a - c2.a) * (c1.a - c2.a)));
   image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
     const thisColor = {
       r: image.bitmap.data[idx],
       g: image.bitmap.data[idx + 1],
       b: image.bitmap.data[idx + 2],
-      a: image.bitmap.data[idx + 3],
     };
     const colorD = colorDistance(targetColor, thisColor);
-    if (colorD <= 120) {
+    if (colorD <= 32) {
       image.bitmap.data[idx] = 255;
       image.bitmap.data[idx + 1] = 255;
       image.bitmap.data[idx + 2] = 255;
@@ -121,17 +117,17 @@ const checkBorder = async (buffer) => {
     }
   });
 
-  for (let x = 0; x < 10; x += 1) {
-    for (let y = 0; y < 10; y += 1) {
-      const midTop = image.getPixelColor(width / 2 + x, y);
-      const midBottom = image.getPixelColor(width / 2 + y, height - y);
-      const midLeft = image.getPixelColor(x, height / 2 + y);
-      const midRight = image.getPixelColor(width - x, height / 2 + y);
+  const realWidth = width - 1;
+  const realHeight = height - 1;
 
-      if ((midTop === midBottom && midTop === MAGIC.JIMP_WHITE_NUMBER)
-        || (midLeft === midRight && midRight === MAGIC.JIMP_WHITE_NUMBER)) {
-        return true;
-      }
+  for (let i = 0; i < 10; i += 1) {
+    const topLeftCorner = image.getPixelColor(i, i);
+    const topRightCorner = image.getPixelColor(realWidth - i, i);
+    const bottomLeftCorner = image.getPixelColor(i, realHeight - i);
+    const bottomRightCorner = image.getPixelColor(realWidth - i, realHeight - i);
+
+    if (topLeftCorner === topRightCorner && bottomLeftCorner === bottomRightCorner) {
+      return true;
     }
   }
 
@@ -221,7 +217,6 @@ const getBoost = async (buffer, frameNum = 0, userOptions) => {
         });
     })
     : frameBuffer;
-
 
   return faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 };
