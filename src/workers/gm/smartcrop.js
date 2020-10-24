@@ -110,7 +110,6 @@ const checkBorder = async (buffer) => {
     };
     const colorD = colorDistance(targetColor, thisColor);
     if (colorD <= 32) {
-      // console.log('colorD', colorD);
       image.bitmap.data[idx] = 255;
       image.bitmap.data[idx + 1] = 255;
       image.bitmap.data[idx + 2] = 255;
