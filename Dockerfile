@@ -7,8 +7,6 @@ RUN groupadd --gid 1000 node \
 
 COPY --chown=node:node assets/ /usr/node/assets
 COPY --chown=node:node package*.json /usr/node/
-COPY --chown=node:node src/ /usr/node/src/
-COPY --chown=node:node config.json /usr/node/
 
 WORKDIR /usr/node
 
@@ -23,6 +21,9 @@ RUN apt-get install autoconf -y
 RUN apt-get install dh-autoreconf -y
 
 RUN npm install
+
+COPY --chown=node:node config.json /usr/node/
+COPY --chown=node:node src/ /usr/node/src/
 
 WORKDIR /usr/node/src
 USER node

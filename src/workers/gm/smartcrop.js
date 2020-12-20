@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cv = require('opencv');
 const im = require('gm').subClass({ imageMagick: true });
-const gm = require('gm');
+const gm = require('gm').subClass({ imageMagick: true });
 const smartcrop = require('smartcrop-gm');
 const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
