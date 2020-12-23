@@ -1,12 +1,13 @@
 const axios = require('axios');
+const sharp = require('sharp');
 const cv = require('opencv');
+const gifResize = require('@gumlet/gif-resize');
 const im = require('gm').subClass({ imageMagick: true });
-const gm = require('gm').subClass({ imageMagick: true });
-const smartcrop = require('smartcrop-gm');
+const gm = require('gm');
 const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminPngquant = require('imagemin-pngquant');
-const imageminGiflossy = require('imagemin-giflossy');
+const smartcrop = require('smartcrop-gm');
 const sizeOf = require('image-size');
 const Jimp = require('jimp');
 
@@ -84,16 +85,17 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
   });
 });
 
-const border = (buffer, borderXSize, borderYSize, color, wantedWidth, wantedHeight) => new Promise(
-  (resolve, reject) => gm(buffer)
-    .border(borderXSize, borderYSize)
-    .borderColor(color)
-    .gravity('center')
-    .resize(wantedWidth, wantedHeight, '!')
-    .toBuffer((err, buf) => {
-      if (err) return reject(err);
-      return resolve(buf);
-    }),
+const border = (buffer, borderXSize, borderYSize, color) => new Promise(
+  (resolve, reject) => {
+    return im(buffer)
+      .coalesce()
+      .border(borderXSize, borderYSize)
+      .borderColor(color)
+      .toBuffer((err, buf) => {
+        if (err) return reject(err);
+        return resolve(buf);
+      });
+  }
 );
 
 const checkBorder = async (buffer) => {
@@ -125,6 +127,11 @@ const checkBorder = async (buffer) => {
     const topRightCorner = image.getPixelColor(realWidth - i, i);
     const bottomLeftCorner = image.getPixelColor(i, realHeight - i);
     const bottomRightCorner = image.getPixelColor(realWidth - i, realHeight - i);
+
+    if ((topLeftCorner === topRightCorner && topLeftCorner === bottomLeftCorner)
+      || (topLeftCorner === topRightCorner && topLeftCorner === bottomRightCorner)) {
+      return true;
+    }
 
     if (topLeftCorner === topRightCorner && bottomLeftCorner === bottomRightCorner) {
       return true;
@@ -158,47 +165,35 @@ const checkTransparency = async (buffer) => {
   });
 };
 
-const promiseGM = (buffer, crop, width, height, isGif, bufferWidth, bufferHeight, sharpenOptions) => new Promise((resolve, reject) => {
+const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise(async (resolve) => {
+  const resizeLess = hasBorder ? 0 : 2;
+
   if (isGif) {
-    const imBuff = im(buffer)
-      .coalesce();
-    // some images with very low quality need more colors or sharpened.
-    if (sharpenOptions && ((bufferWidth <= sharpenOptions.minX && bufferHeight <= sharpenOptions.minY && buffer.length < sharpenOptions.minBufferSize)
-      || (bufferWidth <= sharpenOptions.maxX && bufferHeight <= sharpenOptions.maxY
-        && bufferWidth > sharpenOptions.minX && bufferHeight > sharpenOptions.minY && buffer.length < sharpenOptions.maxBufferSize))) {
-      imBuff.sharpen(2, 1);
+    if (crop) {
+      return resolve(gifResize({ width: 225 - resizeLess, height: 350 - resizeLess, stretch: true, crop: [crop.x, crop.y, crop.width, crop.height] })(buffer));
     }
-
-    if (imBuff && crop) {
-      imBuff.crop(crop.width, crop.height, crop.x, crop.y).repage('+');
-    }
-
-    imBuff.resize(width, height, '!')
-      .toBuffer((err, buf) => {
-        if (err) return reject(err);
-        return resolve(buf);
-      });
-    return imBuff;
+    return resolve(gifResize({ width: 225 - resizeLess, height: 350 - resizeLess, stretch: true })(buffer));
   }
 
   const gmBuff = gm(buffer);
-  // some images with very low quality need more colors or sharpened.
-  if (sharpenOptions && ((bufferWidth <= sharpenOptions.minX && bufferHeight <= sharpenOptions.minY && buffer.length < sharpenOptions.minBufferSize)
-    || (bufferWidth <= sharpenOptions.maxX && bufferHeight <= sharpenOptions.maxY
-      && bufferWidth > sharpenOptions.minX && bufferHeight > sharpenOptions.minY && buffer.length < sharpenOptions.maxBufferSize))) {
-    gmBuff.sharpen(2, 1);
-  }
 
+  let buff;
   if (gmBuff && crop) {
     gmBuff.crop(crop.width, crop.height, crop.x, crop.y);
+    buff = await new Promise((r, rj) => {
+      gmBuff.toBuffer('png', (err, buf) => {
+        if (err) return rj(err);
+        return r(buf);
+      });
+    });
+  } else {
+    buff = buffer;
   }
 
-  gmBuff.resize(width, height, '!')
-    .toBuffer('png', (err, buf) => {
-      if (err) return reject(err);
-      return resolve(buf);
-    });
-  return gmBuff;
+  return resolve(sharp(buff)
+    .resize(width - resizeLess, height - resizeLess, { fit: 'fill' })
+    .png()
+    .toBuffer());
 });
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
@@ -236,11 +231,15 @@ const execute = async (url, width, height, userOptions) => {
   const { border: userBorder } = userOptions;
 
   const isTransparent = isWebP ? true : await checkTransparency(tempBuffer);
+  const imageAlreadyHasBorder = hasBorder || isTransparent || !userBorder;
 
   if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) {
-    return hasBorder || isTransparent || !userBorder
-      ? buffer
-      : border(buffer, userBorder.x, userBorder.y, userBorder.color, width, height);
+
+    const processedBuffer = imageAlreadyHasBorder ? buffer : await promiseGM(buffer, undefined, width, height, isGif, imageAlreadyHasBorder);
+
+    return imageAlreadyHasBorder
+      ? processedBuffer
+      : border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
   }
 
   if (isWebP) {
@@ -262,10 +261,14 @@ const execute = async (url, width, height, userOptions) => {
   const wantedRatio = (width / height).toFixed(2);
 
   const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
-  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, bufferWidth, bufferHeight);
+  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, imageAlreadyHasBorder);
 
-  // add their border if they requested one and image is not transparent
-  const imageBuffer = hasBorder || isTransparent || !userBorder
+  if (isGif && !imageAlreadyHasBorder) {
+    const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
+    return promiseGM(bufferBorder, undefined, width, height, true, true);
+  }
+
+  const imageBuffer = imageAlreadyHasBorder
     ? processedBuffer
     : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
 
@@ -279,7 +282,6 @@ const execute = async (url, width, height, userOptions) => {
         quality: [0.96, 1.00],
         speed: 1,
       }),
-      imageminGiflossy({ unoptimize: true, 'keep-empty': true }),
     ],
   });
 };
