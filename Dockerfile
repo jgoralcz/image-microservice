@@ -16,8 +16,8 @@ RUN apt-get install autoconf -y
 RUN apt-get install dh-autoreconf -y
 
 RUN npm install opencv
-RUN npm install sharp@0.27.0
-RUN npm install canvas
+RUN npm install sharp@0.28.3
+RUN npm install canvas@2.6.1
 RUN npm install gifencoder && npm install gif-encoder-2 && npm install gif-frames
 RUN npm install smartcrop-gm && npm install gm
 RUN npm install git+https://github.com/jgoralcz/gif-resize.git
