@@ -277,10 +277,10 @@ const execute = async (url, width, height, userOptions) => {
     plugins: [
       imageminMozjpeg({
         progressive: false,
-        quality: 90,
+        quality: 85,
       }),
       imageminPngquant({
-        quality: [0.80, 0.90],
+        quality: [0.60, 0.70],
         speed: 1,
       }),
     ],
