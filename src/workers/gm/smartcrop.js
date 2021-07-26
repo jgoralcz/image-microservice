@@ -181,7 +181,7 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise
   if (gmBuff && crop) {
     gmBuff.crop(crop.width, crop.height, crop.x, crop.y);
     buff = await new Promise((r, rj) => {
-      gmBuff.toBuffer('png', (err, buf) => {
+      gmBuff.toBuffer('PNG', (err, buf) => {
         if (err) return rj(err);
         return r(buf);
       });
@@ -192,7 +192,7 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise
 
   return resolve(sharp(buff)
     .resize(width - resizeLess, height - resizeLess, { fit: 'fill' })
-    .webp({ quality: 100, lossless: true, reductionEffort: 6 })
+    .webp({ quality: 95, nearLossless: true, reductionEffort: 6 })
     .toBuffer());
 });
 
@@ -245,7 +245,7 @@ const execute = async (url, width, height, userOptions) => {
   if (isWebP) {
     buffer = await new Promise((resolve, reject) => {
       gm(buffer)
-        .toBuffer('png', (err, buf) => {
+        .toBuffer('PNG', (err, buf) => {
           if (err) return reject(err);
           return resolve(buf);
         });
