@@ -280,7 +280,7 @@ const execute = async (url, width, height, userOptions) => {
         quality: 85,
       }),
       imageminPngquant({
-        quality: [0.80, 0.90],
+        quality: [0.90, 1.00],
         speed: 1,
       }),
     ],
