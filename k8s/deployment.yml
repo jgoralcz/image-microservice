@@ -4,7 +4,7 @@ metadata:
   name: ${SERVICE_NAME}
   namespace: josh-apps
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: ${SERVICE_NAME}
