@@ -192,8 +192,7 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise
 
   return resolve(sharp(buff)
     .resize(width - resizeLess, height - resizeLess, { fit: 'fill' })
-    .webp({ quality: 90, reductionEffort: 6 })
-    .sharpen()
+    .webp({ quality: 95, reductionEffort: 6 })
     .toBuffer());
 });
 
