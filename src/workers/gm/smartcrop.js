@@ -189,13 +189,12 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise
   } else {
     buff = buffer;
   }
-  
-  // attempt at "fixing" a bug with webp not formatting correctly.
-  const sharpBuffTemp = await sharp(buff).resize(width - resizeLess + 1, height - resizeLess + 1, { fit: 'fill' }).toBuffer();
 
-  return resolve(sharp(sharpBuffTemp)
+  console.log('made it here');
+
+  return resolve(sharp(buff)
     .resize(width - resizeLess, height - resizeLess, { fit: 'fill' })
-    .webp({ quality: 98, nearLossless: true, reductionEffort: 6, force: true })
+    .webp({ quality: 90, nearLossless: true, reductionEffort: 6, force: true })
     .toBuffer());
 });
 
