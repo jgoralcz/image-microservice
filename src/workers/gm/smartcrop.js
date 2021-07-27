@@ -86,16 +86,14 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
 });
 
 const border = (buffer, borderXSize, borderYSize, color) => new Promise(
-  (resolve, reject) => {
-    return im(buffer)
-      .coalesce()
-      .border(borderXSize, borderYSize)
-      .borderColor(color)
-      .toBuffer((err, buf) => {
-        if (err) return reject(err);
-        return resolve(buf);
-      });
-  }
+  (resolve, reject) => im(buffer)
+    .coalesce()
+    .border(borderXSize, borderYSize)
+    .borderColor(color)
+    .toBuffer((err, buf) => {
+      if (err) return reject(err);
+      return resolve(buf);
+    }),
 );
 
 const checkBorder = async (buffer) => {
@@ -166,8 +164,8 @@ const checkTransparency = async (buffer) => {
 };
 
 const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX, borderResizeY) => new Promise(async (resolve) => {
-  const borderX = hasBorder ? 0 : borderResizeX;
-  const borderY = hasBorder ? 0 : borderResizeY;
+  const borderX = hasBorder ? 0 : borderResizeX * 2;
+  const borderY = hasBorder ? 0 : borderResizeY * 2;
 
   if (isGif) {
     if (crop) {
@@ -193,9 +191,16 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX,
 
   return resolve(sharp(buff)
     .resize(width - borderX, height - borderY, { fit: 'fill' })
-    .webp({ quality: 88, nearLossless: true, reductionEffort: 6, force: true })
+    .png()
     .toBuffer());
 });
+
+const buffToWebP = async (buffer) => sharp(buffer).webp({
+  quality: 90,
+  // nearLossless: true,
+  reductionEffort: 6,
+  force: true,
+}).toBuffer();
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
   if (!userOptions.face && !userOptions.animeFace) return [];
@@ -230,12 +235,12 @@ const execute = async (url, width, height, userOptions) => {
   const { width: bufferWidth, height: bufferHeight } = await sizeOf(tempBuffer);
   const hasBorder = isWebP ? false : await checkBorder(tempBuffer, width, height);
   const { border: userBorder } = userOptions;
-  
+
   if (userOptions.border.x == null) {
     userOptions.border.x = 2;
   }
-  
-   if (userOptions.border.y == null) {
+
+  if (userOptions.border.y == null) {
     userOptions.border.y = 2;
   }
 
@@ -264,15 +269,17 @@ const execute = async (url, width, height, userOptions) => {
   const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, imageAlreadyHasBorder, userBorder.x, userBorder.y);
 
   if (isGif && !imageAlreadyHasBorder) {
-    const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
+    const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
     return promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
   }
 
   const imageBuffer = imageAlreadyHasBorder
     ? processedBuffer
-    : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
+    : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
 
-  return imagemin.buffer(imageBuffer, {
+  const webP = await buffToWebP(imageBuffer);
+
+  return imagemin.buffer(webP, {
     plugins: [
       imageminMozjpeg({
         progressive: false,

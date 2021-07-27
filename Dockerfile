@@ -1,7 +1,5 @@
 FROM joshgor01/ubuntu_node_opencv:latest
 
-COPY package*.json ./
-
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
 
