@@ -235,15 +235,6 @@ const execute = async (url, width, height, userOptions) => {
   const isTransparent = isWebP ? true : await checkTransparency(tempBuffer);
   const imageAlreadyHasBorder = hasBorder || isTransparent || !userBorder;
 
-  if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) {
-
-    const processedBuffer = imageAlreadyHasBorder ? buffer : await promiseGM(buffer, undefined, width, height, isGif, imageAlreadyHasBorder);
-
-    return imageAlreadyHasBorder
-      ? processedBuffer
-      : border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
-  }
-
   if (isWebP) {
     buffer = await new Promise((resolve, reject) => {
       gm(buffer)
