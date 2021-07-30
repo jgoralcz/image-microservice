@@ -14,8 +14,7 @@ const env = process.env.NODE_ENV || LOCAL;
 
 const server = express();
 
-server.use(bodyparser({ limit: '1000mb' }));
-server.use(bodyparser.urlencoded({ extended: true, limit: '1000mb' }));
+server.use(bodyparser.urlencoded({ parameterLimit: 100000, extended: true, limit: '1000mb' }));
 server.use(bodyparser.json({
   limit: '1000mb',
   reviver: (k, v) => {
@@ -31,6 +30,7 @@ server.use(bodyparser.json({
     return v;
   },
 }));
+server.use(bodyparser({ limit: '1000mb' }));
 
 server.use(httpLogger());
 
