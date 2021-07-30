@@ -14,24 +14,8 @@ const env = process.env.NODE_ENV || LOCAL;
 
 const server = express();
 
-server.use(bodyparser.urlencoded({ parameterLimit: 100000, extended: true, limit: '1000mb' }));
-server.use(bodyparser.json({
-  limit: '1000mb',
-  reviver: (k, v) => {
-    if (
-      v !== null
-      && typeof v === 'object'
-      && 'type' in v
-      && v.type === 'Buffer'
-      && 'data' in v
-      && Array.isArray(v.data)) {
-      return Buffer.from(v.data);
-    }
-    return v;
-  },
-}));
-server.use(bodyparser({ limit: '1000mb' }));
-
+server.use(bodyparser.urlencoded({ extended: true }));
+server.use(bodyparser.json({ limit: '50mb' }));
 server.use(httpLogger());
 
 const defaultProcesses = 3;
