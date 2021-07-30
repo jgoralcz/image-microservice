@@ -16,6 +16,7 @@ const server = express();
 
 server.use(bodyparser.urlencoded({ extended: true }));
 server.use(bodyparser.json({
+  limit: '50000kb',
   reviver: (k, v) => {
     if (
       v !== null
