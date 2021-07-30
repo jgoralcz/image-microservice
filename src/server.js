@@ -1,4 +1,3 @@
-const bodyparser = require('body-parser');
 const express = require('express');
 const logger = require('log4js').getLogger();
 const { errorHandler } = require('./middleware/errorHandler.js');
@@ -14,8 +13,7 @@ const env = process.env.NODE_ENV || LOCAL;
 
 const server = express();
 
-server.use(bodyparser.json({ limit: '50mb' }));
-server.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
+server.use(express.json({ limit: '50mb' }));
 server.use(httpLogger());
 
 const defaultProcesses = 3;
