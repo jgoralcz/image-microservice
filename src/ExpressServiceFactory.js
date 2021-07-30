@@ -248,7 +248,6 @@ module.exports = {
     }
 
     if (worker != null) {
-      console.log('body', body);
       // send the message
       worker.send({
         endpoint: module.name,
