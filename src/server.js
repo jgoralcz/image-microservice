@@ -14,8 +14,8 @@ const env = process.env.NODE_ENV || LOCAL;
 
 const server = express();
 
-server.use(bodyparser.urlencoded({ extended: true }));
 server.use(bodyparser.json({ limit: '50mb' }));
+server.use(bodyparser.urlencoded({ limit: '50mb', extended: true }));
 server.use(httpLogger());
 
 const defaultProcesses = 3;
