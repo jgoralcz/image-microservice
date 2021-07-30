@@ -86,16 +86,14 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
 });
 
 const border = (buffer, borderXSize, borderYSize, color) => new Promise(
-  (resolve, reject) => {
-    return im(buffer)
-      .coalesce()
-      .border(borderXSize, borderYSize)
-      .borderColor(color)
-      .toBuffer((err, buf) => {
-        if (err) return reject(err);
-        return resolve(buf);
-      });
-  }
+  (resolve, reject) => im(buffer)
+    .coalesce()
+    .border(borderXSize, borderYSize)
+    .borderColor(color)
+    .toBuffer((err, buf) => {
+      if (err) return reject(err);
+      return resolve(buf);
+    }),
 );
 
 const checkBorder = async (buffer) => {
@@ -165,14 +163,15 @@ const checkTransparency = async (buffer) => {
   });
 };
 
-const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise(async (resolve) => {
-  const resizeLess = hasBorder ? 0 : 2;
+const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX, borderResizeY) => new Promise(async (resolve) => {
+  const borderX = hasBorder ? 0 : borderResizeX * 2;
+  const borderY = hasBorder ? 0 : borderResizeY * 2;
 
   if (isGif) {
     if (crop) {
-      return resolve(gifResize({ width: 225 - resizeLess, height: 350 - resizeLess, stretch: true, crop: [crop.x, crop.y, crop.width, crop.height] })(buffer));
+      return resolve(gifResize({ width: 225 - borderX, height: 350 - borderY, stretch: true, crop: [crop.x, crop.y, crop.width, crop.height] })(buffer));
     }
-    return resolve(gifResize({ width: 225 - resizeLess, height: 350 - resizeLess, stretch: true })(buffer));
+    return resolve(gifResize({ width: 225 - borderX, height: 350 - borderY, stretch: true })(buffer));
   }
 
   const gmBuff = gm(buffer);
@@ -181,7 +180,7 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise
   if (gmBuff && crop) {
     gmBuff.crop(crop.width, crop.height, crop.x, crop.y);
     buff = await new Promise((r, rj) => {
-      gmBuff.toBuffer('png', (err, buf) => {
+      gmBuff.toBuffer('PNG', (err, buf) => {
         if (err) return rj(err);
         return r(buf);
       });
@@ -191,11 +190,17 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder) => new Promise
   }
 
   return resolve(sharp(buff)
-    .resize(width - resizeLess, height - resizeLess, { fit: 'fill' })
+    .resize(width - borderX, height - borderY, { fit: 'fill' })
     .png()
-    .sharpen()
     .toBuffer());
 });
+
+const buffToWebP = async (buffer) => sharp(buffer).webp({
+  quality: 90,
+  // nearLossless: true,
+  reductionEffort: 6,
+  force: true,
+}).toBuffer();
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
   if (!userOptions.face && !userOptions.animeFace) return [];
@@ -222,36 +227,29 @@ const execute = async (url, width, height, userOptions) => {
   if (!buffer) return undefined;
 
   const isWebP = isImageType(buffer, MAGIC.webp);
+  if (isWebP) {
+    buffer = await sharp(buffer).png();
+  }
+
   const isGif = isImageType(buffer, MAGIC.gifNumber);
 
   const tempBuffer = isGif ? await promiseGMBufferFrame(buffer, 0) : buffer;
 
   // already wanted width, height... no need to do any special processing...
   const { width: bufferWidth, height: bufferHeight } = await sizeOf(tempBuffer);
-  const hasBorder = isWebP ? false : await checkBorder(tempBuffer, width, height);
+  const hasBorder = await checkBorder(tempBuffer, width, height);
   const { border: userBorder } = userOptions;
 
-  const isTransparent = isWebP ? true : await checkTransparency(tempBuffer);
+  if (userOptions.border.x == null) {
+    userOptions.border.x = 2;
+  }
+
+  if (userOptions.border.y == null) {
+    userOptions.border.y = 2;
+  }
+
+  const isTransparent = await checkTransparency(tempBuffer);
   const imageAlreadyHasBorder = hasBorder || isTransparent || !userBorder;
-
-  if (width === bufferWidth && height === bufferHeight && buffer.length > (userOptions.minBuffer || 25000)) {
-
-    const processedBuffer = imageAlreadyHasBorder ? buffer : await promiseGM(buffer, undefined, width, height, isGif, imageAlreadyHasBorder);
-
-    return imageAlreadyHasBorder
-      ? processedBuffer
-      : border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
-  }
-
-  if (isWebP) {
-    buffer = await new Promise((resolve, reject) => {
-      gm(buffer)
-        .toBuffer('png', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
-  }
 
   let boost = await getBoost(buffer, 0, userOptions);
   if ((!boost || boost.length <= 0) && isGif) {
@@ -262,25 +260,27 @@ const execute = async (url, width, height, userOptions) => {
   const wantedRatio = (width / height).toFixed(2);
 
   const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
-  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, imageAlreadyHasBorder);
+  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, imageAlreadyHasBorder, userBorder.x, userBorder.y);
 
   if (isGif && !imageAlreadyHasBorder) {
-    const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
-    return promiseGM(bufferBorder, undefined, width, height, true, true);
+    const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
+    return promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
   }
 
   const imageBuffer = imageAlreadyHasBorder
     ? processedBuffer
-    : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color, width, height);
+    : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
 
-  return imagemin.buffer(imageBuffer, {
+  const webP = await buffToWebP(imageBuffer);
+
+  return imagemin.buffer(webP, {
     plugins: [
       imageminMozjpeg({
         progressive: false,
-        quality: 98,
+        quality: 85,
       }),
       imageminPngquant({
-        quality: [0.96, 1.00],
+        quality: [0.90, 1.00],
         speed: 1,
       }),
     ],
