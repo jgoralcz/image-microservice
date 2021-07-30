@@ -14,10 +14,10 @@ const env = process.env.NODE_ENV || LOCAL;
 
 const server = express();
 
-server.use(bodyparser({ limit: '50mb' }));
-server.use(bodyparser.urlencoded({ extended: true, limit: '50mb' }));
+server.use(bodyparser({ limit: '1000mb' }));
+server.use(bodyparser.urlencoded({ extended: true, limit: '1000mb' }));
 server.use(bodyparser.json({
-  limit: '50mb',
+  limit: '1000mb',
   reviver: (k, v) => {
     if (
       v !== null
