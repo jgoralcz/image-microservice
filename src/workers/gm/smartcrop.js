@@ -227,13 +227,17 @@ const execute = async (url, width, height, userOptions) => {
   if (!buffer) return undefined;
 
   const isWebP = isImageType(buffer, MAGIC.webp);
+  if (isWebP) {
+    buffer = await sharp(buffer).png();
+  }
+
   const isGif = isImageType(buffer, MAGIC.gifNumber);
 
   const tempBuffer = isGif ? await promiseGMBufferFrame(buffer, 0) : buffer;
 
   // already wanted width, height... no need to do any special processing...
   const { width: bufferWidth, height: bufferHeight } = await sizeOf(tempBuffer);
-  const hasBorder = isWebP ? false : await checkBorder(tempBuffer, width, height);
+  const hasBorder = await checkBorder(tempBuffer, width, height);
   const { border: userBorder } = userOptions;
 
   if (userOptions.border.x == null) {
@@ -244,18 +248,8 @@ const execute = async (url, width, height, userOptions) => {
     userOptions.border.y = 2;
   }
 
-  const isTransparent = isWebP ? true : await checkTransparency(tempBuffer);
+  const isTransparent = await checkTransparency(tempBuffer);
   const imageAlreadyHasBorder = hasBorder || isTransparent || !userBorder;
-
-  if (isWebP) {
-    buffer = await new Promise((resolve, reject) => {
-      gm(buffer)
-        .toBuffer('PNG', (err, buf) => {
-          if (err) return reject(err);
-          return resolve(buf);
-        });
-    });
-  }
 
   let boost = await getBoost(buffer, 0, userOptions);
   if ((!boost || boost.length <= 0) && isGif) {
