@@ -15,7 +15,21 @@ const env = process.env.NODE_ENV || LOCAL;
 const server = express();
 
 server.use(bodyparser.urlencoded({ extended: true }));
-server.use(bodyparser.json());
+server.use(bodyparser.json({
+  reviver: (k, v) => {
+    if (
+      v !== null
+      && typeof v === 'object'
+      && 'type' in v
+      && v.type === 'Buffer'
+      && 'data' in v
+      && Array.isArray(v.data)) {
+      return Buffer.from(v.data);
+    }
+    return v;
+  },
+}));
+
 server.use(httpLogger());
 
 const defaultProcesses = 3;
