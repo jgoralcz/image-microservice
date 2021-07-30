@@ -248,9 +248,26 @@ module.exports = {
     }
 
     if (worker != null) {
+      const updatedBody = JSON.parse(body, (k, v) => {
+        if (
+          v !== null
+          && typeof v === 'object'
+          && 'type' in v
+          && v.type === 'Buffer'
+          && 'data' in v
+          && Array.isArray(v.data)) {
+              return Buffer.from(v.data);
+        }
+        return v;
+      });
+      console.log(updatedBody);
       // send the message
       worker.send({
-        endpoint: module.name, body, buffers: module.buffers, requestNum: this.requestNum, contentType: module.contentType || 'image/jpeg',
+        endpoint: module.name,
+        body: updatedBody,
+        buffers: module.buffers,
+        requestNum: this.requestNum,
+        contentType: module.contentType || 'image/jpeg',
       });
     }
 

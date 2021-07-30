@@ -413,7 +413,7 @@ process.on('message', async (message) => {
         break;
 
       case 'smartcrop':
-        buffer = await smartcrop(body.image_url, body.width, body.height, body.options);
+        buffer = await smartcrop(body.image_url, body.width, body.height, body.buffer, body.options);
         break;
 
       case 'magik':

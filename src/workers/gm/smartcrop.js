@@ -222,13 +222,19 @@ const getBoost = async (buffer, frameNum = 0, userOptions) => {
   return faceDetect(reduceQualityBuffer, userOptions).catch(() => []) || [];
 };
 
-const execute = async (url, width, height, userOptions) => {
-  let { data: buffer } = await axios.get(url, { responseType: 'arraybuffer' });
+const execute = async (url, width, height, passedBuffer, userOptions) => {
+  let buffer;
+  if (passedBuffer) {
+    buffer = passedBuffer;
+  } else {
+    const { data } = await axios.get(url, { responseType: 'arraybuffer' });
+    if (data) buffer = data;
+  }
   if (!buffer) return undefined;
 
   const isWebP = isImageType(buffer, MAGIC.webp);
   if (isWebP) {
-    buffer = await sharp(buffer).png();
+    buffer = await sharp(buffer).png().toBuffer();
   }
 
   const isGif = isImageType(buffer, MAGIC.gifNumber);
