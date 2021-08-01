@@ -164,8 +164,8 @@ const checkTransparency = async (buffer) => {
 };
 
 const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX, borderResizeY) => new Promise(async (resolve) => {
-  const borderX = hasBorder ? 0 : Math.ceil(borderResizeX) * 2;
-  const borderY = hasBorder ? 0 : Math.ceil(borderResizeY) * 2;
+  const borderX = hasBorder && isGif ? 0 : Math.ceil(borderResizeX) * 2;
+  const borderY = hasBorder && isGif ? 0 : Math.ceil(borderResizeY) * 2;
 
   if (isGif) {
     if (crop) {
@@ -273,9 +273,7 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
     return promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
   }
 
-  const imageBuffer = imageAlreadyHasBorder
-    ? processedBuffer
-    : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
+  const imageBuffer = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
 
   const webP = await buffToWebP(imageBuffer);
 
