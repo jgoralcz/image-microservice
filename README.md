@@ -93,6 +93,9 @@ localhost:9002/api/halloweenify
 
 ___
 
+## Contributing
+I would recommend using the local.Dockerfile like so: `docker rm -f mims || true && docker build -t mims . -f local.Dockerfile && docker run -p 8443:8443 -d --restart=always --memory="1024m" --name mims mims`
+
 ## Pull Requests
 If you would like to add your own fun creation, feel free to make a pull request!
 My only request is to follow the current structure that is provided and make sure the endpoint is appropriate.
