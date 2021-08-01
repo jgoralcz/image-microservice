@@ -189,6 +189,16 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX,
     buff = buffer;
   }
 
+  if (borderX || borderY) {
+    gmBuff.crop(width - borderX, height - borderY, borderResizeX, borderResizeY);
+    buff = await new Promise((r, rj) => {
+      gmBuff.toBuffer('PNG', (err, buf) => {
+        if (err) return rj(err);
+        return r(buf);
+      });
+    });
+  }
+
   return resolve(sharp(buff)
     .resize(width - borderX, height - borderY, { fit: 'fill' })
     .png()
