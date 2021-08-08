@@ -221,7 +221,7 @@ const buffToWebP = async (buffer) => {
     force: true,
   }).toBuffer();
   
-  if (buffer1.length < 35000) {
+  if (buffer1.length < 40000) {
     return sharp(buffer).webp({
       quality: 100,
       nearLossless: true,
