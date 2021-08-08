@@ -220,28 +220,18 @@ const buffToWebP = async (buffer) => {
     reductionEffort: 6,
     force: true,
   }).toBuffer();
-  
-  if (buffer1.length > 40000) {
+
+  if (buffer1.length > 45000) {
     return buffer1;
   }
 
-  const buffer2 = await sharp(buffer).webp({
+  return sharp(buffer).webp({
     quality: 100,
     // nearLossless: true,
     reductionEffort: 6,
     force: true,
   }).toBuffer();
-  
-  if (buffer2.length > 40000) {
-    return buffer2;
-  }
-  
-  return sharp(buffer).webp({
-    nearLossless: true,
-    reductionEffort: 6,
-    force: true,
-  }).toBuffer();
-}
+};
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
   if (!userOptions.face && !userOptions.animeFace) return [];
