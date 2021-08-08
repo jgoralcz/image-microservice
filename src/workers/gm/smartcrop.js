@@ -221,16 +221,26 @@ const buffToWebP = async (buffer) => {
     force: true,
   }).toBuffer();
   
-  if (buffer1.length < 40000) {
-    return sharp(buffer).webp({
-//       quality: 100,
-      nearLossless: true,
-      reductionEffort: 6,
-      force: true,
-    }).toBuffer();
+  if (buffer1.length > 40000) {
+    return buffer1;
+  }
+
+  const buffer2 = await sharp(buffer).webp({
+    quality: 100,
+    // nearLossless: true,
+    reductionEffort: 6,
+    force: true,
+  }).toBuffer();
+  
+  if (buffer2.length > 40000) {
+    return buffer2;
   }
   
-  return buffer1;
+  return sharp(buffer).webp({
+    nearLossless: true,
+    reductionEffort: 6,
+    force: true,
+  }).toBuffer();
 }
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
