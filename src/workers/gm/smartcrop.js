@@ -213,12 +213,25 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX,
   return resolve(buff);
 });
 
-const buffToWebP = async (buffer) => sharp(buffer).webp({
-  quality: 96,
-  // nearLossless: true,
-  reductionEffort: 6,
-  force: true,
-}).toBuffer();
+const buffToWebP = async (buffer) => {
+  const buffer1 = await sharp(buffer).webp({
+    quality: 95,
+    // nearLossless: true,
+    reductionEffort: 6,
+    force: true,
+  }).toBuffer();
+  
+  if (buffer1.length < 35000) {
+    return sharp(buffer).webp({
+      quality: 100,
+      // nearLossless: true,
+      reductionEffort: 6,
+      force: true,
+    }).toBuffer();
+  }
+  
+  return buffer1;
+}
 
 const getBoost = async (buffer, frameNum = 0, userOptions) => {
   if (!userOptions.face && !userOptions.animeFace) return [];
