@@ -215,7 +215,7 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX,
 
 const buffToWebP = async (buffer) => {
   const buffer1 = await sharp(buffer).webp({
-    quality: 95,
+    quality: 96,
     // nearLossless: true,
     reductionEffort: 6,
     force: true,
@@ -224,7 +224,7 @@ const buffToWebP = async (buffer) => {
   if (buffer1.length < 35000) {
     return sharp(buffer).webp({
       quality: 100,
-      // nearLossless: true,
+      nearLossless: true,
       reductionEffort: 6,
       force: true,
     }).toBuffer();
