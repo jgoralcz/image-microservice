@@ -275,18 +275,22 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
   // already wanted width, height... no need to do any special processing...
   const { width: bufferWidth, height: bufferHeight } = await sizeOf(tempBuffer);
   const hasBorder = await checkBorder(tempBuffer, width, height);
-  const { border: userBorder } = userOptions;
 
-  if (userOptions.border.x == null) {
+  const isTransparent = await checkTransparency(tempBuffer);
+  const imageAlreadyHasBorder = hasBorder || isTransparent || !userOptions.border;
+  if (!userOptions.border) {
+    userOptions.border = {};
+  }
+
+  if (userOptions && userOptions.border && userOptions.border.x == null) {
     userOptions.border.x = 2;
   }
 
-  if (userOptions.border.y == null) {
+  if (userOptions && userOptions.border && userOptions.border.y == null) {
     userOptions.border.y = 2;
   }
 
-  const isTransparent = await checkTransparency(tempBuffer);
-  const imageAlreadyHasBorder = hasBorder || isTransparent || !userBorder;
+  const { border: userBorder } = userOptions;
 
   let boost = await getBoost(buffer, 0, userOptions);
   if ((!boost || boost.length <= 0) && isGif) {
@@ -299,9 +303,12 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
   const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
   const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, imageAlreadyHasBorder, userBorder.x, userBorder.y);
 
-  if (isGif && !imageAlreadyHasBorder) {
-    const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
-    return promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
+  if (isGif) {
+    if (!imageAlreadyHasBorder) {
+      const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
+      return promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
+    }
+    return promiseGM(buffer, undefined, width, height, true, true, userBorder.x, userBorder.y);
   }
 
   const imageBuffer = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
