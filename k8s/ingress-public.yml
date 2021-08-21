@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io
 kind: Ingress
 metadata:
   name: ${SERVICE_NAME}
@@ -13,9 +13,12 @@ spec:
       http:
         paths:
           - path: /
+            pathType: Prefix
             backend:
-              serviceName: ${SERVICE_NAME}
-              servicePort: ${PORT}
+              service:
+                name: ${SERVICE_NAME}
+                port:
+                  number: 8443
   tls:
     - hosts:
         - ${HOST_URL}

@@ -7,6 +7,7 @@ const gm = require('gm');
 const imagemin = require('imagemin');
 const imageminMozjpeg = require('imagemin-mozjpeg');
 const imageminPngquant = require('imagemin-pngquant');
+const imageminGifquant = require('imagemin-giflossy');
 const smartcrop = require('smartcrop-gm');
 const sizeOf = require('image-size');
 const Jimp = require('jimp');
@@ -301,17 +302,34 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
   const wantedRatio = (width / height).toFixed(2);
 
   const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
-  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, imageAlreadyHasBorder, userBorder.x, userBorder.y);
+  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, isTransparent, userBorder.x, userBorder.y);
 
   if (isGif) {
     if (!imageAlreadyHasBorder) {
       const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
-      return promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
+      const finalBuffer = await promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
+
+      return imagemin.buffer(finalBuffer, {
+        plugins: [
+          imageminGifquant({
+            optimizationLevel: 3,
+            lossy: 40,
+          }),
+        ],
+      });
     }
-    return promiseGM(buffer, undefined, width, height, true, true, userBorder.x, userBorder.y);
+    const finalBuffer = await promiseGM(buffer, undefined, width, height, true, true, userBorder.x, userBorder.y);
+    return imagemin.buffer(finalBuffer, {
+      plugins: [
+        imageminGifquant({
+          optimizationLevel: 3,
+          lossy: 40,
+        }),
+      ],
+    });
   }
 
-  const imageBuffer = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
+  const imageBuffer = isTransparent ? processedBuffer : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
 
   const webP = await buffToWebP(imageBuffer);
 

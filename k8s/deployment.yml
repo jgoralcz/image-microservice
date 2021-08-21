@@ -4,7 +4,7 @@ metadata:
   name: ${SERVICE_NAME}
   namespace: josh-apps
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
       app: ${SERVICE_NAME}
@@ -26,11 +26,11 @@ spec:
               value: "${ENV}"
           resources:
             limits:
-              cpu: 2000m
-              memory: 2048Mi
+          #     cpu: 2000m
+              memory: 4096Mi
             requests:
-              cpu: 1000m
-              memory: 1024Mi
+              # cpu: 1000m
+              memory: 2048Mi
           ports:
             - containerPort: 8443
       imagePullSecrets:
