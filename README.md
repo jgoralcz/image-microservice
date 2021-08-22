@@ -40,7 +40,7 @@ I use this with `request-promise`.
 ```$xslt
 options = {
     method: 'POST',
-    uri: 'http://localhost:9002/api/' + endpoint, //endpoint is the image (see below)
+    uri: 'http://localhost:8443/api/' + endpoint, //endpoint is the image (see below)
     encoding: null,
     headers: {
         'Content-type': 'application/json'
@@ -53,7 +53,7 @@ If you do not want a buffer and want a string (say the `ascii` endpoint), set yo
 ```$xslt
 const options =  {
     method: 'POST',
-    uri: 'http://localhost:9002/api/ascii',
+    uri: 'http://localhost:8443/api/ascii',
     body: body,
     json: true
 };
@@ -62,30 +62,30 @@ _____
 **Here are some examples with the body.**
 
 1) The `hot` endpoint requires the `image_url` \
-localhost:9002/api/hot
+localhost:8443/api/hot
     ```$xslt
     POST /api/hot HTTP/1.1
-    Host: localhost:9002
+    Host: localhost:8443
     Content-Type: application/json
     
     {"image_url": "https://pbs.twimg.com/media/DtwaeFtUwAAPbxk.jpg"}
     ```
 
 2) The `hatkidsays` endpoint requires text \
-localhost:9002/api/hatkidsays
+localhost:8443/api/hatkidsays
     ```$xslt
     POST /api/hatkidsays HTTP/1.1
-    Host: localhost:9002
+    Host: localhost:8443
     Content-Type: application/json
     
     {"text": "Make sure you brush your teeth!"}
     ```
 3) The `halloweenify` endpoint requires an image url and a threshold. \
-localhost:9002/api/halloweenify
+localhost:8443/api/halloweenify
 
     ```$xslt
     POST /api/halloweenify HTTP/1.1
-    Host: localhost:9002
+    Host: localhost:8443
     Content-Type: application/json
 
     {"image_url": "https://pbs.twimg.com/media/DtwaeFtUwAAPbxk.jpg", "threshold": "1"}
