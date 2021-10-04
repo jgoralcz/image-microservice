@@ -227,7 +227,7 @@ const buffToWebP = async (buffer) => {
   }
 
   return sharp(buffer).webp({
-    quality: 98,
+    quality: 99,
     nearLossless: true,
     reductionEffort: 6,
     force: true,
