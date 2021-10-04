@@ -222,12 +222,12 @@ const buffToWebP = async (buffer) => {
     force: true,
   }).toBuffer();
 
-  if (buffer1.length > 65000) {
+  if (buffer1.length > 50000) {
     return buffer1;
   }
 
   return sharp(buffer).webp({
-    quality: 85,
+    quality: 98,
     nearLossless: true,
     reductionEffort: 6,
     force: true,
