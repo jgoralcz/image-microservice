@@ -129,7 +129,6 @@ module.exports = {
               this.responses.splice(i, 1);
             }
           }
-          console.log(this.responses);
         }
       }
     }, 6e5); // 10 minutes

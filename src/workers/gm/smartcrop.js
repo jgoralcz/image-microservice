@@ -5,8 +5,6 @@ const gifResize = require('@gumlet/gif-resize');
 const im = require('gm').subClass({ imageMagick: true });
 const gm = require('gm');
 const imagemin = require('imagemin');
-const imageminMozjpeg = require('imagemin-mozjpeg');
-const imageminPngquant = require('imagemin-pngquant');
 const imageminGifquant = require('imagemin-giflossy');
 const smartcrop = require('smartcrop-gm');
 const sizeOf = require('image-size');
@@ -332,20 +330,7 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
 
   const imageBuffer = isTransparent ? processedBuffer : await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
 
-  const webP = await buffToWebP(imageBuffer);
-
-  return imagemin.buffer(webP, {
-    plugins: [
-      imageminMozjpeg({
-        progressive: false,
-        quality: 85,
-      }),
-      imageminPngquant({
-        quality: [0.90, 1.00],
-        speed: 1,
-      }),
-    ],
-  });
+  return buffToWebP(imageBuffer);
 };
 
 module.exports = execute;

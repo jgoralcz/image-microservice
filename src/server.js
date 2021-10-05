@@ -1,9 +1,9 @@
 const express = require('express');
 const logger = require('log4js').getLogger();
-const { errorHandler } = require('./middleware/errorHandler.js');
+const { errorHandler } = require('./middleware/errorHandler');
 const { httpLogger } = require('./middleware/logger');
 const { LOCAL } = require('./util/constants/environments');
-const startFactory = require('./ExpressServiceFactory.js');
+const startFactory = require('./ExpressServiceFactory');
 
 const { processes } = require('../config.json');
 
