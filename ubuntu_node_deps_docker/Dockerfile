@@ -33,9 +33,6 @@ RUN apt update && apt install libjasper1 libjasper-dev -y
 RUN rm /etc/apt/sources.list.d/xenial.list
 RUN apt update
 
-# Change memory allocator to avoid "leaks"
-# ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
-
 RUN apt-get update && apt-get install -y \ 
   wget \
   build-essential \ 
