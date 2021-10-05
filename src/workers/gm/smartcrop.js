@@ -222,6 +222,8 @@ const buffToWebP = async (buffer) => {
     force: true,
   }).toBuffer();
 
+  console.log('buffer length', buffer1.length);
+
   if (buffer1.length > 50000) {
     return buffer1;
   }
