@@ -48,14 +48,6 @@ const MAGIC = Object.freeze({
   JIMP_WHITE_NUMBER: 4294967295,
 });
 
-const targetColor = {
-  r: 255,
-  g: 255,
-  b: 255,
-};
-
-const colorDistance = (c1, c2) => ((c1.r - c2.r) + (c1.g - c2.g) + (c1.b - c2.b)) / 3;
-
 const ANIME_FACE_CASCADE = '/usr/node/assets/opencv/lbpcascade_animeface.xml';
 
 const isImageType = (buffer, type = MAGIC.gifNumber) => buffer.toString('hex', 0, 4) === type;
@@ -84,59 +76,15 @@ const promiseGMBufferFrame = (buffer, frame = 0) => new Promise((resolve, reject
   });
 });
 
-const border = (buffer, borderXSize, borderYSize, color) => new Promise(
-  (resolve, reject) => im(buffer)
-    .coalesce()
-    .border(borderXSize, borderYSize)
-    .borderColor(color)
-    .toBuffer((err, buf) => {
-      if (err) return reject(err);
-      return resolve(buf);
-    }),
-);
-
-const checkBorder = async (buffer) => {
-  const image = await Jimp.read(buffer);
-
-  const { width, height } = image.bitmap;
-  if (width < 10 || height < 10) return false;
-
-  image.scan(0, 0, image.bitmap.width, image.bitmap.height, (x, y, idx) => {
-    const thisColor = {
-      r: image.bitmap.data[idx],
-      g: image.bitmap.data[idx + 1],
-      b: image.bitmap.data[idx + 2],
-    };
-    const colorD = colorDistance(targetColor, thisColor);
-    if (colorD <= 32) {
-      image.bitmap.data[idx] = 255;
-      image.bitmap.data[idx + 1] = 255;
-      image.bitmap.data[idx + 2] = 255;
-      image.bitmap.data[idx + 3] = 255;
-    }
-  });
-
-  const realWidth = width - 1;
-  const realHeight = height - 1;
-
-  for (let i = 0; i < 10; i += 1) {
-    const topLeftCorner = image.getPixelColor(i, i);
-    const topRightCorner = image.getPixelColor(realWidth - i, i);
-    const bottomLeftCorner = image.getPixelColor(i, realHeight - i);
-    const bottomRightCorner = image.getPixelColor(realWidth - i, realHeight - i);
-
-    if ((topLeftCorner === topRightCorner && topLeftCorner === bottomLeftCorner)
-      || (topLeftCorner === topRightCorner && topLeftCorner === bottomRightCorner)) {
-      return true;
-    }
-
-    if (topLeftCorner === topRightCorner && bottomLeftCorner === bottomRightCorner) {
-      return true;
-    }
-  }
-
-  return false;
-};
+// eslint-disable-next-line max-len
+const border = (buffer, borderXSize, borderYSize, color) => new Promise((resolve, reject) => im(buffer)
+  .coalesce()
+  .border(borderXSize, borderYSize)
+  .borderColor(color)
+  .toBuffer((err, buf) => {
+    if (err) return reject(err);
+    return resolve(buf);
+  }));
 
 const checkTransparency = async (buffer) => {
   // resize so we don't need to process anything extra
@@ -162,15 +110,16 @@ const checkTransparency = async (buffer) => {
   });
 };
 
-const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX, borderResizeY) => new Promise(async (resolve) => {
+const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX, borderResizeY, foundRatio) => new Promise(async (resolve) => {
   const borderX = hasBorder && isGif ? 0 : Math.ceil(borderResizeX) * 2;
   const borderY = hasBorder && isGif ? 0 : Math.ceil(borderResizeY) * 2;
 
   if (isGif) {
     if (crop) {
-      return resolve(gifResize({ width: 225 - borderX, height: 350 - borderY, stretch: true, crop: [crop.x, crop.y, crop.width, crop.height] })(buffer));
+      // TODO: fix this gif problem
+      return resolve(gifResize({ width: 225 - borderX, height: 350 - borderY, crop: [crop.x, crop.y, crop.width, crop.height] })(buffer));
     }
-    return resolve(gifResize({ width: 225 - borderX, height: 350 - borderY, stretch: true })(buffer));
+    return resolve(buffer);
   }
 
   let gmBuff = gm(buffer);
@@ -192,6 +141,20 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX,
     .resize(width, height, { fit: 'fill' })
     .png()
     .toBuffer();
+
+  if (foundRatio) {
+    buff = await new Promise((r, rj) => {
+      gm(buff).crop(width - 5, height - 5, 5, 5).toBuffer('PNG', (err, buf) => {
+        if (err) return rj(err);
+        return r(buf);
+      });
+    });
+
+    buff = await sharp(buff)
+      .resize(width, height, { fit: 'fill' })
+      .png()
+      .toBuffer();
+  }
 
   if (borderX || borderY) {
     gmBuff = gm(buff);
@@ -219,8 +182,6 @@ const buffToWebP = async (buffer) => {
     reductionEffort: 6,
     force: true,
   }).toBuffer();
-
-  console.log('buffer length', buffer1.length);
 
   if (buffer1.length > 50000) {
     return buffer1;
@@ -275,20 +236,23 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
 
   // already wanted width, height... no need to do any special processing...
   const { width: bufferWidth, height: bufferHeight } = await sizeOf(tempBuffer);
-  const hasBorder = await checkBorder(tempBuffer, width, height);
 
   const isTransparent = await checkTransparency(tempBuffer);
-  const imageAlreadyHasBorder = hasBorder || isTransparent || !userOptions.border;
+  const imageAlreadyHasBorder = isTransparent || !userOptions.border;
   if (!userOptions.border) {
     userOptions.border = {};
   }
 
   if (userOptions && userOptions.border && userOptions.border.x == null) {
-    userOptions.border.x = 2;
+    userOptions.border.x = isGif ? 1 : 2;
   }
 
   if (userOptions && userOptions.border && userOptions.border.y == null) {
-    userOptions.border.y = 2;
+    userOptions.border.y = isGif ? 1 : 2;
+  }
+
+  if (userOptions && userOptions.border && !userOptions.border.color) {
+    userOptions.border.color = 'white';
   }
 
   const { border: userBorder } = userOptions;
@@ -302,12 +266,12 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
   const wantedRatio = (width / height).toFixed(2);
 
   const { topCrop: crop } = bufferRatio === wantedRatio ? { topCrop: undefined } : await smartcrop.crop(buffer, { width, height, boost });
-  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, isTransparent, userBorder.x, userBorder.y);
+  const processedBuffer = await promiseGM(buffer, crop, width, height, isGif, isTransparent, userBorder.x, userBorder.y, bufferRatio === wantedRatio);
 
   if (isGif) {
     if (!imageAlreadyHasBorder) {
       const bufferBorder = await border(processedBuffer, userBorder.x, userBorder.y, userBorder.color);
-      const finalBuffer = await promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y);
+      const finalBuffer = await promiseGM(bufferBorder, undefined, width, height, true, true, userBorder.x, userBorder.y, bufferRatio === wantedRatio);
 
       return imagemin.buffer(finalBuffer, {
         plugins: [
@@ -318,7 +282,8 @@ const execute = async (url, width, height, passedBuffer, userOptions) => {
         ],
       });
     }
-    const finalBuffer = await promiseGM(buffer, undefined, width, height, true, true, userBorder.x, userBorder.y);
+
+    const finalBuffer = processedBuffer;
     return imagemin.buffer(finalBuffer, {
       plugins: [
         imageminGifquant({

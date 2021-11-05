@@ -30,7 +30,7 @@
     "imagemin-giflossy": "^5.1.10",
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.2",
-    "jimp": "^0.16.1",
+    "jimp": "^0.9.8",
     "log4js": "^6.3.0",
     "qr-image": "^3.2.0"
   },
