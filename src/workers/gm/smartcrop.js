@@ -144,7 +144,7 @@ const promiseGM = (buffer, crop, width, height, isGif, hasBorder, borderResizeX,
 
   if (foundRatio) {
     buff = await new Promise((r, rj) => {
-      gm(buff).crop(width - 5, height - 5, 5, 5).toBuffer('PNG', (err, buf) => {
+      gm(buff).crop(width - 3, height - 3, 3, 3).toBuffer('PNG', (err, buf) => {
         if (err) return rj(err);
         return r(buf);
       });
