@@ -7,20 +7,12 @@ module.exports = {
     const [border, snow] = images;
     const { data: buffer } = await axios.get(imageURL, { responseType: 'arraybuffer' });
 
-    const bufferSnow = await sharp(buffer)
-      .composite([{
-        input: Buffer.from(snow),
-        blend: 'overlay',
-      }])
-      .resize({ width: 450, height: 700, fit: 'fill' })
-      .toBuffer();
-
-    return sharp(bufferSnow)
+    return sharp(buffer)
       .composite([{
         input: Buffer.from(border),
       }])
       .resize({ width: 450, height: 700, fit: 'fill' })
-      .webp({ quality: 50 })
+      .webp({ quality: 60 })
       .toBuffer();
   },
 };
