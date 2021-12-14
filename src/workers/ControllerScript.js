@@ -1,29 +1,30 @@
+/* eslint-disable no-fallthrough */
 // the main script to run most of your commands so the threads (actually processes for now)
-const halloweenify = require('./jimp/Halloweenify.js');
-const colorify = require('./jimp/Colorify.js');
-const blurpify = require('./jimp/Blurpify.js');
-const jpegify = require('./jimp/Jpegify.js');
-const ascii = require('./jimp/Ascii.js');
-const imgtobase64 = require('./jimp/IMGToBase64.js');
-const giftobase64 = require('./jimp/GifToBase64.js');
-const qrcodetext = require('./jimp/qrCode.js');
-const pixelate = require('./jimp/Pixelate.js');
+const halloweenify = require('./jimp/Halloweenify');
+const colorify = require('./jimp/Colorify');
+const blurpify = require('./jimp/Blurpify');
+const jpegify = require('./jimp/Jpegify');
+const ascii = require('./jimp/Ascii');
+const imgtobase64 = require('./jimp/IMGToBase64');
+const giftobase64 = require('./jimp/GifToBase64');
+const qrcodetext = require('./jimp/qrCode');
+const pixelate = require('./jimp/Pixelate');
 
 // canvas
-const cmm = require('./canvas/ChangeMyMind.js');
-const achievement = require('./canvas/Achievement.js');
-const noteText = require('./canvas/NoteText.js');
-const pengu = require('./canvas/Pengu.js');
-const trumpLaw = require('./canvas/TrumpLaw.js');
-const tweetPerson = require('./canvas/TweetPerson.js');
-const whyFBIHere = require('./canvas/WhyFBIHere.js');
-const sonicsays = require('./canvas/SonicSays.js');
-const bazinga = require('./canvas/Bazinga.js');
-const rdog = require('./canvas/Rdog.js');
-const hatkidsays = require('./canvas/HatKidSays.js');
-const fry = require('./canvas/Fried.js');
-const deepfry = require('./canvas/DeepFry.js');
-const overfry = require('./canvas/OverFry.js');
+const cmm = require('./canvas/ChangeMyMind');
+const achievement = require('./canvas/Achievement');
+const noteText = require('./canvas/NoteText');
+const pengu = require('./canvas/Pengu');
+const trumpLaw = require('./canvas/TrumpLaw');
+const tweetPerson = require('./canvas/TweetPerson');
+const whyFBIHere = require('./canvas/WhyFBIHere');
+const sonicsays = require('./canvas/SonicSays');
+const bazinga = require('./canvas/Bazinga');
+const rdog = require('./canvas/Rdog');
+const hatkidsays = require('./canvas/HatKidSays');
+const fry = require('./canvas/Fried');
+const deepfry = require('./canvas/DeepFry');
+const overfry = require('./canvas/OverFry');
 const billyYes = require('./canvas/BillyYes');
 const yerin = require('./canvas/Yerin');
 const water = require('./canvas/Water');
@@ -36,15 +37,17 @@ const america = require('./canvas/America');
 const weeb = require('./canvas/Weeb');
 const ping = require('./canvas/Ping');
 
-const homie = require('./jimp/Homie.js');
+const homie = require('./jimp/Homie');
 
 // helpers
-const canvasHelper = require('./WorkerHelpers/CanvasHelper.js');
-const loadBuffer = require('./canvas/LoadBuffer.js');
+const canvasHelper = require('./WorkerHelpers/CanvasHelper');
+const loadBuffer = require('./canvas/LoadBuffer');
 
 // sharp
-const sharpen = require('./sharp/Sharpen.js');
-const blur = require('./sharp/Blur.js');
+const sharpen = require('./sharp/Sharpen');
+const blur = require('./sharp/Blur');
+// const user = require('./sharp/user');
+const border = require('./sharp/border');
 
 // gm
 const magik = require('./gm/Magik');
@@ -66,6 +69,15 @@ process.on('message', async (message) => {
         buffer = await canvasHelper.execute(message.buffers, body.image_url, {
           resizeX: 75, resizeY: 75, compositeX1: 95, compositeY1: 79,
         });
+        break;
+
+      // case 'user':
+      //   // TODO: fix this
+      //   buffer = await user.execute(message.buffers, body.image_url);
+      //   break;
+
+      case 'border':
+        buffer = await border.execute(message.buffers, body.image_url);
         break;
 
       case 'deepfry':

@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/jgoralcz/image-microservice#readme",
   "dependencies": {
-    "axios": "^0.21.1",
-    "eslint": "^7.31.0",
+    "axios": "^0.24.0",
+    "eslint": "^8.4.1",
     "express": "^4.17.1",
     "express-rate-limit": "^5.3.0",
     "gif-frames": "^1.0.1",
