@@ -13,9 +13,6 @@ spec:
       labels:
         app: ${SERVICE_NAME}
     spec:
-      nodeSelector:
-        location: na
-        type: high-cpu
       containers:
         - name: ${SERVICE_NAME}
           image: ${IMAGE_LOCATION}
